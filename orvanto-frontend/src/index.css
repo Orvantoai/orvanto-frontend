@@ -21,9 +21,30 @@
   /* Defensive explicit site-nav rule to ensure navbar stays fixed */
   .site-nav{position:fixed;top:0;left:0;right:0;z-index:1100;padding:32px 0;border-bottom:1px solid rgba(30,30,46,.5);backdrop-filter:blur(20px);background:rgba(10,10,15,.9)}
   .nav-inner{display:flex;align-items:center;justify-content:space-between}
-  .logo{display:flex;align-items:center;gap:12px;font-weight:800;font-size:1.25rem;text-decoration:none}
-  .logo-mark{width:44px;height:44px;border-radius:10px;object-fit:contain;display:block;flex:0 0 44px;box-shadow:0 8px 30px rgba(99,102,241,0.08);align-self:center}
-  .logo-text{background:linear-gradient(135deg,var(--purple),var(--indigo));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:1.25rem;display:inline-flex;align-items:center;line-height:1}
+  .logo {
+  display: flex;
+  align-items: center;
+  gap: 0px; /* slightly tighter looks better */
+}
+
+.logo-mark {
+  width: 54px;
+  height: 54px;
+  border-radius: 10px;
+  object-fit: contain;
+  flex-shrink: 0; /* prevents squishing */
+  display: block; /* remove inline-flex */
+}
+
+.logo-text {
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  position: relative;
+  top: 12px;
+}
   .nav-links{display:flex;gap:32px;align-items:center}
   .nav-links a{color:var(--muted);font-size:.9rem;font-weight:500;transition:color .2s}
   .nav-links a:hover{color:var(--text)}
