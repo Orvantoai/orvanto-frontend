@@ -12,7 +12,6 @@ export default function Footer() {
             </p>
             <p style={{ color: 'var(--subtle)', fontSize: '.75rem', marginTop: 16 }}>
               Sanfy Consultancy Services Pvt. Ltd.<br />
-              Varanasi, Uttar Pradesh, India
             </p>
           </div>
           <div className="footer-col">

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 // Navbar moved to App.jsx (rendered globally)
 import AIFlowAnimation from '../components/AIFlowAnimation';
 import Footer from '../components/Footer';
@@ -22,6 +22,7 @@ const FAQS = [
 
 export default function Home() {
   const heroRef = useRef(null);
+  const [selectedPlan, setSelectedPlan] = useState('growth');
 
 
   // Hero in-view observer for heading reveal
@@ -180,7 +181,7 @@ export default function Home() {
 
       {/* HERO */}
       <section className="hero" ref={heroRef}>
-        <div className="container">
+        <div className="container" style={{marginTop:90}}>
           {/* <div className="section-label">Trusted by 200+ B2B companies</div> */}
           <h1 className="hero-heading">
             <span className="hero-line">Stop Chasing Leads.</span>
@@ -298,83 +299,6 @@ export default function Home() {
         <HowItWorks />
       </section>
 
-      {/* 5 CHANNELS */}
-      <section style={{ background: 'var(--card)' }} data-reveal="channels">
-        <div className="container">
-          <div className="section-label" data-anim>5-Channel Outreach</div>
-          <h2 className="section-title" data-anim>Your prospect can't ignore 5 simultaneous channels</h2>
-          <p className="section-sub" data-anim>Most companies send one email and hope. Orvanto AI reaches your prospects on every channel they actually use — automatically, in the right sequence.</p>
-          <div className="channels grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mt-16 pb-12 w-full max-w-[1500px] mx-auto px-6">
-            
-            <div className="channel-card group flex flex-col h-full p-8 lg:p-10 rounded-[2rem] bg-[var(--card)] backdrop-blur-sm border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(168,85,247,0.15)] hover:border-[var(--purple)]/40 transition-all duration-300 text-left" data-anim>
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--purple)]/20 to-transparent border border-[var(--purple)]/30 flex items-center justify-center shrink-0">
-                  <i className="fa-solid fa-envelope text-xl text-[var(--purple)] drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]"></i>
-                </div>
-                <h3 className="text-xl lg:text-2xl font-black text-white group-hover:text-[var(--purple)] transition-colors m-0">Email</h3>
-              </div>
-              <div className="w-full h-px bg-white/5 mb-6 group-hover:bg-[var(--purple)]/50 transition-colors" />
-              <p className="text-sm lg:text-[15px] text-[var(--muted)] leading-relaxed m-0">
-                GPT-4o personalised emails via Instantly.ai with perfect deliverability. 3-4 sentence emails that sound human. The multi-variate core autonomously rotates dynamic subject line structures across massive decentralized inbox networks ensuring infinite daily volume.
-              </p>
-            </div>
-
-            <div className="channel-card group flex flex-col h-full p-8 lg:p-10 rounded-[2rem] bg-[var(--card)] backdrop-blur-sm border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(37,211,102,0.15)] hover:border-[#25D366]/40 transition-all duration-300 text-left" data-anim>
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#25D366]/20 to-transparent border border-[#25D366]/30 flex items-center justify-center shrink-0">
-                  <i className="fa-brands fa-whatsapp text-2xl text-[#25D366] drop-shadow-[0_0_10px_rgba(37,211,102,0.5)]"></i>
-                </div>
-                <h3 className="text-xl lg:text-2xl font-black text-white group-hover:text-[#25D366] transition-colors m-0">WhatsApp</h3>
-              </div>
-              <div className="w-full h-px bg-white/5 mb-6 group-hover:bg-[#25D366]/50 transition-colors" />
-              <p className="text-sm lg:text-[15px] text-[var(--muted)] leading-relaxed m-0">
-                98% open rate. Sent Day 5+ to warm leads via 360dialog. Templates approved for B2B outreach. Direct inbox penetration leverages deep personalized conversational memory frameworks entirely verified against Meta business policies and spam filters.
-              </p>
-            </div>
-
-            <div className="channel-card group flex flex-col h-full p-8 lg:p-10 rounded-[2rem] bg-[var(--card)] backdrop-blur-sm border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(99,102,241,0.15)] hover:border-[var(--indigo)]/40 transition-all duration-300 text-left" data-anim>
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--indigo)]/20 to-transparent border border-[var(--indigo)]/30 flex items-center justify-center shrink-0">
-                  <i className="fa-solid fa-comment-sms text-xl text-[var(--indigo)] drop-shadow-[0_0_10px_rgba(99,102,241,0.5)]"></i>
-                </div>
-                <h3 className="text-xl lg:text-2xl font-black text-white group-hover:text-[var(--indigo)] transition-colors m-0">SMS</h3>
-              </div>
-              <div className="w-full h-px bg-white/5 mb-6 group-hover:bg-[var(--indigo)]/50 transition-colors" />
-              <p className="text-sm lg:text-[15px] text-[var(--muted)] leading-relaxed m-0">
-                Short, direct texts via Twilio sent Day 9+. TCPA compliant. Timezone-aware. Drives immediate responses. The decentralized routing infrastructure scales ultra-high volume broadcast campaigns natively matching rotating local geographical phone boundaries effortlessly. 
-              </p>
-            </div>
-
-            <div className="channel-card group flex flex-col h-full p-8 lg:p-10 rounded-[2rem] bg-[var(--card)] backdrop-blur-sm border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(96,165,250,0.15)] hover:border-blue-400/40 transition-all duration-300 text-left" data-anim>
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400/20 to-transparent border border-blue-400/30 flex items-center justify-center shrink-0">
-                  <i className="fa-solid fa-microphone-lines text-xl text-blue-400 drop-shadow-[0_0_10px_rgba(96,165,250,0.5)]"></i>
-                </div>
-                <h3 className="text-xl lg:text-2xl font-black text-white group-hover:text-blue-400 transition-colors m-0">Voice AI</h3>
-              </div>
-              <div className="w-full h-px bg-white/5 mb-6 group-hover:bg-blue-400/50 transition-colors" />
-              <p className="text-sm lg:text-[15px] text-[var(--muted)] leading-relaxed m-0">
-                VAPI AI voice calls Day 12+. Sounds like a real person. Transcribed and analysed automatically. Generative engine intelligence synthesizes hyper-realistic live voice cloning capable of handling complex conversational interruptions and real-time gatekeeper objections dynamically.
-              </p>
-            </div>
-
-            <div className="channel-card group flex flex-col h-full p-8 lg:p-10 rounded-[2rem] bg-[var(--card)] backdrop-blur-sm border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(0,119,181,0.15)] hover:border-[#0077b5]/40 transition-all duration-300 text-left" data-anim>
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#0077b5]/20 to-transparent border border-[#0077b5]/30 flex items-center justify-center shrink-0">
-                  <i className="fa-brands fa-linkedin-in text-xl text-[#0077b5] drop-shadow-[0_0_10px_rgba(0,119,181,0.5)]"></i>
-                </div>
-                <h3 className="text-xl lg:text-2xl font-black text-white group-hover:text-[#0077b5] transition-colors m-0">LinkedIn</h3>
-              </div>
-              <div className="w-full h-px bg-white/5 mb-6 group-hover:bg-[#0077b5]/50 transition-colors" />
-              <p className="text-sm lg:text-[15px] text-[var(--muted)] leading-relaxed m-0">
-                Personalised connection requests via HeyReach on Day 7+. Pro plan. 20 connections/day. Never flagged. Scales deep contextual profile intelligence mapping to guarantee automated acceptance milestones while bypassing strict commercial use constraints autonomously.
-              </p>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
       {/* FEATURES */}
       <section id="features" data-reveal="features">
         <div className="container !max-w-[1600px] px-6 lg:px-12">
@@ -436,7 +360,7 @@ export default function Home() {
                 <h3 className="text-xl lg:text-2xl font-black text-white group-hover:text-emerald-400 transition-colors m-0">Daily Leads</h3>
               </div>
               <div className="w-full h-px bg-white/5 mb-6 group-hover:bg-emerald-400/50 transition-colors" />
-              <p className="text-sm lg:text-[15px] text-[var(--muted)] leading-relaxed m-0 mt-auto">Apollo.io finds 50-200 verified decision-makers daily matching your exact ICP. Enriched with emails and phones automatically mapped into active arrays.</p>
+              <p className="text-sm lg:text-[15px] text-[var(--muted)] leading-relaxed m-0 mt-auto">Apollo.io finds 50–200 verified decision-makers daily that match your exact ICP, ensuring a consistent and high-quality lead pipeline. Each contact is enriched with accurate emails and phone numbers, automatically mapped into active arrays for seamless outreach. This eliminates manual prospecting and reduces time spent on data collection. The system keeps your pipeline fresh by continuously updating and validating contact information.</p>
             </div>
 
             <div className="group flex flex-col h-full lg:col-span-3 lg:row-span-2 p-8 lg:p-10 rounded-[2rem] bg-[var(--card)] backdrop-blur-sm border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(52,211,153,0.15)] hover:border-emerald-400/40 transition-all duration-300 text-left" data-anim>
@@ -458,7 +382,7 @@ export default function Home() {
                 <h3 className="text-xl lg:text-2xl font-black text-white group-hover:text-emerald-400 transition-colors m-0">Reply Intel</h3>
               </div>
               <div className="w-full h-px bg-white/5 mb-6 group-hover:bg-emerald-400/50 transition-colors" />
-              <p className="text-sm lg:text-[15px] text-[var(--muted)] leading-relaxed m-0 mt-auto">Every reply is classified as interested/not interested/meeting request automatically.</p>
+              <p className="text-sm lg:text-[15px] text-[var(--muted)] leading-relaxed m-0 mt-auto">Every reply is automatically classified into clear intent categories such as interested, not interested, or meeting request, enabling instant understanding of lead behavior without manual effort. This classification system uses contextual analysis to accurately interpret tone, keywords, and response patterns from incoming messages. As a result, sales teams can prioritize high-intent prospects, re-engage lukewarm leads, and filter out uninterested responses efficiently. </p>
             </div>
 
             <div className="group flex flex-col h-full lg:col-span-7 lg:row-span-1 p-8 lg:p-10 rounded-[2rem] bg-[var(--card)] backdrop-blur-sm border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(52,211,153,0.15)] hover:border-emerald-400/40 transition-all duration-300 text-left" data-anim>
@@ -709,9 +633,18 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 mt-12 w-full mx-auto items-stretch">
             
             {/* STARTER TIER */}
-            <div className="tier-card relative z-10 w-full rounded-[2rem] bg-[#111116]/40 backdrop-blur-md border border-white/10 p-8 lg:p-10 flex flex-col hover:-translate-y-2 transition-all duration-300 shadow-xl group" data-anim>
-              
-              <div className="px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-xs font-bold text-white/50 w-fit mb-8 shadow-sm">Starter Plan</div>
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => setSelectedPlan('starter')}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSelectedPlan('starter'); }}
+              className={`tier-card relative z-10 w-full rounded-[2rem] p-8 lg:p-10 flex flex-col hover:-translate-y-2 transition-all duration-300 group ${selectedPlan === 'starter' ? 'bg-[#1a1428]/50 backdrop-blur-md border border-[var(--purple)] shadow-[0_0_60px_rgba(168,85,247,0.15)] xl:scale-105 z-10' : 'bg-[#111116]/40 backdrop-blur-md border border-white/10 shadow-xl'}`}
+              data-anim
+            >
+
+              <div className={`px-4 py-1.5 rounded-full w-fit mb-8 ${selectedPlan === 'starter' ? 'bg-[var(--purple)]/20 border border-[var(--purple)]/50 text-xs font-bold text-[var(--purple)] shadow-[0_0_15px_rgba(168,85,247,0.3)]' : 'bg-white/[0.04] border border-white/10 text-xs font-bold text-white/50 shadow-sm'}`}>
+                {selectedPlan === 'starter' ? 'Popular Plan' : 'Starter Plan'}
+              </div>
               
               <div className="mb-10">
                 <h3 className="text-[44px] font-black text-white tracking-tight leading-none mb-3">$597<span className="text-2xl font-bold text-white/40 tracking-normal">/month</span></h3>
@@ -750,18 +683,25 @@ export default function Home() {
                 </li>
               </ul>
               
-              <Link to="/signup?plan=starter" className="w-full py-4 rounded-full bg-white/[0.04] text-white/60 font-bold hover:bg-white/10 hover:text-white transition-all text-center border border-white/5 hover:border-white/20 shadow-inner">
+              <Link to="/signup?plan=starter" className={`${selectedPlan === 'starter' ? 'relative z-10 w-full py-4 rounded-full bg-gradient-to-r from-[var(--purple)] to-indigo-600 text-white font-bold hover:scale-[1.03] transition-all text-center shadow-[0_0_30px_rgba(168,85,247,0.4)]' : 'w-full py-4 rounded-full bg-white/[0.04] text-white/60 font-bold hover:bg-white/10 hover:text-white transition-all text-center border border-white/5 hover:border-white/20 shadow-inner'}`}>
                 Start Free Trial
               </Link>
             </div>
 
             {/* GROWTH TIER (Middle) */}
-            <div className="tier-card relative w-full rounded-[2rem] bg-[#1a1428]/50 backdrop-blur-md border border-[var(--purple)] p-8 lg:p-10 flex flex-col hover:-translate-y-2 transition-all duration-300 shadow-[0_0_60px_rgba(168,85,247,0.15)] group xl:scale-105 z-10" data-anim>
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => setSelectedPlan('growth')}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSelectedPlan('growth'); }}
+              className={`tier-card relative w-full rounded-[2rem] p-8 lg:p-10 flex flex-col hover:-translate-y-2 transition-all duration-300 group ${selectedPlan === 'growth' ? 'bg-[#1a1428]/50 backdrop-blur-md border border-[var(--purple)] shadow-[0_0_60px_rgba(168,85,247,0.15)] xl:scale-105 z-10' : 'bg-[#111116]/40 backdrop-blur-md border border-white/10 p-8 lg:p-10 flex flex-col shadow-xl'}`}
+              data-anim
+            >
               
               {/* Inner Glow */}
               <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[100%] h-[60%] bg-[var(--purple)]/20 blur-[80px] pointer-events-none rounded-full"></div>
 
-              <div className="relative z-10 px-4 py-1.5 rounded-full bg-[var(--purple)]/20 border border-[var(--purple)]/50 text-xs font-bold text-[var(--purple)] w-fit mb-8 shadow-[0_0_15px_rgba(168,85,247,0.3)]">Popular Plan</div>
+              <div className={`relative z-10 px-4 py-1.5 rounded-full w-fit mb-8 ${selectedPlan === 'growth' ? 'bg-[var(--purple)]/20 border border-[var(--purple)]/50 text-xs font-bold text-[var(--purple)] shadow-[0_0_15px_rgba(168,85,247,0.3)]' : 'bg-white/[0.04] border border-white/10 text-xs font-bold text-white/50 shadow-sm'}`}>{selectedPlan === 'growth' ? 'Popular Plan' : 'Growth Plan'}</div>
               
               <div className="relative z-10 mb-10">
                 <h3 className="text-[44px] font-black text-white tracking-tight leading-none mb-3">$997<span className="text-2xl font-bold text-white/60 tracking-normal">/month</span></h3>
@@ -800,15 +740,24 @@ export default function Home() {
                 </li>
               </ul>
               
-              <Link to="/signup?plan=growth" className="relative z-10 w-full py-4 rounded-full bg-gradient-to-r from-[var(--purple)] to-indigo-600 text-white font-bold hover:scale-[1.03] transition-all text-center shadow-[0_0_30px_rgba(168,85,247,0.4)]">
+              <Link to="/signup?plan=growth" className={`${selectedPlan === 'growth' ? 'relative z-10 w-full py-4 rounded-full bg-gradient-to-r from-[var(--purple)] to-indigo-600 text-white font-bold hover:scale-[1.03] transition-all text-center shadow-[0_0_30px_rgba(168,85,247,0.4)]' : 'relative z-10 w-full py-4 rounded-full bg-gradient-to-r from-[var(--purple)] to-indigo-600 text-white font-bold hover:scale-[1.03] transition-all text-center shadow-[0_0_30px_rgba(168,85,247,0.4)]'}`}>
                 Start 7-days Free Trial
               </Link>
             </div>
 
             {/* PRO TIER */}
-            <div className="tier-card relative z-10 w-full rounded-[2rem] bg-[#111116]/40 backdrop-blur-md border border-white/10 p-8 lg:p-10 flex flex-col hover:-translate-y-2 transition-all duration-300 shadow-xl group" data-anim>
-              
-              <div className="px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-xs font-bold text-white/50 w-fit mb-8 shadow-sm">Pro Plan</div>
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => setSelectedPlan('pro')}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSelectedPlan('pro'); }}
+              className={`tier-card relative z-10 w-full rounded-[2rem] p-8 lg:p-10 flex flex-col hover:-translate-y-2 transition-all duration-300 group ${selectedPlan === 'pro' ? 'bg-[#1a1428]/50 backdrop-blur-md border border-[var(--purple)] shadow-[0_0_60px_rgba(168,85,247,0.15)] xl:scale-105 z-10' : 'bg-[#111116]/40 backdrop-blur-md border border-white/10 shadow-xl'}`}
+              data-anim
+            >
+
+              <div className={`px-4 py-1.5 rounded-full w-fit mb-8 ${selectedPlan === 'pro' ? 'bg-[var(--purple)]/20 border border-[var(--purple)]/50 text-xs font-bold text-[var(--purple)] shadow-[0_0_15px_rgba(168,85,247,0.3)]' : 'bg-white/[0.04] border border-white/10 text-xs font-bold text-white/50 shadow-sm'}`}>
+                {selectedPlan === 'pro' ? 'Popular Plan' : 'Pro Plan'}
+              </div>
               
               <div className="mb-10">
                 <h3 className="text-[44px] font-black text-white tracking-tight leading-none mb-3">$1,997<span className="text-2xl font-bold text-white/40 tracking-normal">/month</span></h3>
@@ -847,7 +796,7 @@ export default function Home() {
                 </li>
               </ul>
               
-              <Link to="/signup?plan=pro" className="w-full py-4 rounded-full bg-white/[0.04] text-white/60 font-bold hover:bg-white/10 hover:text-white transition-all text-center border border-white/5 hover:border-white/20 shadow-inner">
+              <Link to="/signup?plan=pro" className={`${selectedPlan === 'pro' ? 'relative z-10 w-full py-4 rounded-full bg-gradient-to-r from-[var(--purple)] to-indigo-600 text-white font-bold hover:scale-[1.03] transition-all text-center shadow-[0_0_30px_rgba(168,85,247,0.4)]' : 'w-full py-4 rounded-full bg-white/[0.04] text-white/60 font-bold hover:bg-white/10 hover:text-white transition-all text-center border border-white/5 hover:border-white/20 shadow-inner'}`}>
                 Start Free Trial
               </Link>
             </div>

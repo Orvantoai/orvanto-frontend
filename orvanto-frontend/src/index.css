@@ -19,7 +19,7 @@
   nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:16px 0;border-bottom:1px solid rgba(30,30,46,.5);backdrop-filter:blur(20px);background:rgba(10,10,15,.8)}
 
   /* Defensive explicit site-nav rule to ensure navbar stays fixed */
-  .site-nav{position:fixed;top:0;left:0;right:0;z-index:1100;padding:32px 0;border-bottom:1px solid rgba(30,30,46,.5);backdrop-filter:blur(20px);background:rgba(10,10,15,.9)}
+  .site-nav{position:fixed;top:0;left:0;right:0;z-index:1100;padding:32px 0;border-bottom:1px solid rgba(30,30,46,.5);backdrop-filter:blur(20px);background:rgba(10,10,15,.9);}
   .nav-inner{display:flex;align-items:center;justify-content:space-between}
   .logo {
   display: flex;
@@ -1550,6 +1550,51 @@
 
 .guarantee-box-new strong {
   color: var(--green);
+}
+
+/* ===== Mobile: Home page tweaks ===== */
+@media (max-width: 768px) {
+  /* Reduce global section padding for mobile */
+  section { padding: 56px 0; scroll-margin-top: 72px; }
+
+  /* HERO adjustments */
+  .hero { padding: 80px 16px 56px; }
+  .hero::before { width: 320px; height: 320px; opacity: 0.28; }
+  .hero h1 { font-size: clamp(1.8rem, 6.5vw, 2.6rem); margin-bottom: 12px; }
+  .hero p { font-size: 1rem; max-width: 100%; margin: 0 auto 18px; padding: 0 8px; }
+  .hero-ctas { gap: 10px; }
+
+  /* Hide the wide ticker on small viewports to avoid overflow */
+  .ticker-wrapper { display: none !important; }
+
+  /* Pricing: simplify visuals and reduce paddings */
+  #pricing .pointer-events-none { display: none !important; } /* hide watermark */
+  .tier-card { padding: 18px !important; border-radius: 1rem !important; }
+  .tier-card h3 { font-size: 28px !important; line-height: 1 !important; }
+  .tier-card p { font-size: .95rem !important; }
+  .tier-card .px-4 { padding: 6px 10px !important; font-size: .75rem !important; }
+  .tier-card a { padding: 10px 12px !important; font-size: .95rem !important; }
+
+  /* Before/After: hide decorative arrow on small screens */
+  section[data-reveal="transform"] .anim-arrow { display: none; }
+
+  /* Reduce/disable very large background elements */
+  .contact-bg-text, .signup-bg-text { display: none; }
+
+  /* Contact page adjustments (also helps home footer/contact previews) */
+  .contact-page { padding: 80px 12px; }
+  .contact-grid { grid-template-columns: 1fr; gap: 28px; }
+  .contact-info-card { padding: 14px; }
+  .contact-form-card { padding: 14px; }
+  .support-row { flex-direction: column; gap: 12px; }
+  .support-hours-badge, .social-icon-btn { height: auto; min-height: 56px; padding: 12px; }
+
+  /* CTA and footer spacing */
+  .cta-final { padding: 48px 16px; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; gap: 12px; }
+
+  /* Reduce heavy shadows for mobile to improve performance and readability */
+  .card, .price-card, .plan-card, .plan-card-new, .tier-card { box-shadow: none !important; }
 }
 
 

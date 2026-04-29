@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import { submitContact } from '../services/api';
+import { supabase } from '../services/supabaseClient';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -9,10 +11,53 @@ export default function Contact() {
   
   const [isSuccess, setIsSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Auth: load current user and subscribe to auth changes
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const { data } = await supabase.auth.getUser();
+        if (!mounted) return;
+        setUser(data?.user ?? null);
+      } catch {
+        if (!mounted) return;
+        setUser(null);
+      } finally {
+        if (mounted) setAuthLoading(false);
+      }
+    })();
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setAuthLoading(false);
+    });
+
+    return () => {
+      mounted = false;
+      sub?.subscription?.unsubscribe?.();
+      sub?.unsubscribe?.();
+    };
+  }, []);
+
+  // Prefill name/email when user is available
+  useEffect(() => {
+    if (!user) return;
+    // Prefill only if fields are empty — avoid overwriting user input
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFormData(prev => ({
+      ...prev,
+      email: prev.email || user.email || '',
+      name: prev.name || (user.user_metadata?.full_name || user.user_metadata?.name || '')
+    }));
+  }, [user]);
 
   const setUrgency = (val) => {
     setFormData(prev => ({...prev, urgency: val}));
@@ -24,12 +69,30 @@ export default function Contact() {
       return;
     }
 
+    // Require authentication to submit support requests
+    if (!user) {
+      // prompt user to sign up / login
+      // keep them on page after login would be ideal, but redirect to signup for now
+      if (confirm('You must be signed in to submit a support request. Go to Sign up / Login?')) {
+        navigate('/signup');
+      }
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await submitContact(formData);
+      const payload = {
+        ...formData,
+        user_id: user.id,
+        user_email: user.email,
+        user_metadata: user.user_metadata || {}
+      };
+      await submitContact(payload);
       setIsSuccess(true);
-    } catch {
-      setIsSuccess(true);
+    } catch (err) {
+      console.error('submitContact error', err);
+      alert('Failed to send message. Please try again later.');
+      setIsSubmitting(false);
     }
   };
 
@@ -92,7 +155,7 @@ export default function Contact() {
                   </div>
                 </div> */}
 
-                <div className="contact-info-card group">
+                {/* <div className="contact-info-card group">
                   <div className="contact-info-content">
                     <div className="contact-info-icon">
                       <i className="fa-solid fa-map-marker-alt"></i>
@@ -105,7 +168,7 @@ export default function Contact() {
                   <div className="contact-info-arrow">
                     <i className="fa-solid fa-arrow-up-right-from-square"></i>
                   </div>
-                </div>
+                </div> */}
               </div>
 
               {/* Extra left block info */}
@@ -118,10 +181,10 @@ export default function Contact() {
                   </div>
                 </div>
                 <div className="social-connect">
-                  <a href="#" className="social-icon-btn"><i className="fa-brands fa-linkedin-in"></i></a>
-                  <a href="#" className="social-icon-btn"><i className="fa-brands fa-x"></i></a>
-                  <a href="#" className="social-icon-btn"><i className="fa-brands fa-instagram"></i></a>
-                  <a href="#" className="social-icon-btn"><i className="fa-brands fa-whatsapp"></i></a>
+                  <a href="https://www.linkedin.com/company/orvanto-ai/" className="social-icon-btn"><i className="fa-brands fa-linkedin-in"></i></a>
+                  {/* <a href="#" className="social-icon-btn"><i className="fa-brands fa-x"></i></a>
+                  <a href="#" className="social-icon-btn"><i className="fa-brands fa-instagram"></i></a> */}
+                  <a href="https://wa.me/9795222283" className="social-icon-btn"><i className="fa-brands fa-whatsapp"></i></a>
                 
                 </div>
                 
@@ -133,6 +196,7 @@ export default function Contact() {
               <div className="contact-form-card">
                 {!isSuccess ? (
                   <>
+                    {authLoading && <div className="mb-4 text-sm text-[var(--muted)]">Checking authentication...</div>}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
                       <div className="field">
                         <label>Your Name</label>
