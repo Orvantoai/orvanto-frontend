@@ -1,0 +1,42 @@
+/* Layout wrappers */
+.outreach-wrap { padding: 0 36px 48px 36px; }
+.outreach-top { display:flex; flex-direction:column; gap:12px; }
+
+.outreach-grid { display: grid; grid-template-columns: 1fr 360px; gap: 16px; margin-top: 18px; align-items: start; }
+.main-col { display:flex; flex-direction:column; gap: 12px; }
+.right-col { width: 360px; display:flex; flex-direction:column; gap:12px; }
+
+/* Reuse .card from other pages; ensure min heights for charts */
+.chart-large { min-height: 320px; display:flex; flex-direction:column; }
+.lower-charts { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+
+.line-svg { width: 100%; height: 220px; }
+.donut-svg { width: 120px; height: 120px; }
+
+/* Funnel stages use CSS var --w provided inline */
+.funnel-stage { height: 40px; border-radius: 8px; margin-bottom: 8px; color: #fff; display:flex; align-items:center; justify-content:space-between; padding: 8px 12px; width: var(--w); box-sizing: border-box; }
+.funnel-meta { display:flex; justify-content:space-between; width:100%; font-weight:700; }
+.funnel-meta span { opacity: 0.95; }
+
+.recent-activity .activity-table { width: 100%; border-collapse: collapse; }
+.activity-table thead th { text-align: left; color: var(--muted); font-weight: 700; font-size: 13px; padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+.activity-table tbody td { padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.02); color: var(--muted); font-size: 13px; }
+.activity-table tbody tr td:first-child { color: var(--text); }
+
+.status-pill { padding: 6px 10px; border-radius: 999px; font-weight: 800; font-size: 12px; }
+.status-replied { background: linear-gradient(90deg,var(--green),#34d399); color: #052e16; }
+.status-accepted { background: linear-gradient(90deg,var(--purple),var(--indigo)); color: #081226; }
+.status-opened { background: rgba(255,255,255,0.02); color: var(--muted); }
+
+/* Slight card overrides to keep visuals consistent */
+.card { background: var(--card); border-radius: 12px; padding: 14px; border: 1px solid var(--border); box-shadow: 0 6px 18px rgba(2,6,23,0.45); }
+
+/* Buttons reused across pages (minimal) */
+.btn-small { background: transparent; border: 1px solid rgba(255,255,255,0.04); padding: 8px 10px; border-radius: 8px; color: var(--muted); font-weight:800; }
+.btn-add { background: linear-gradient(135deg,var(--purple),var(--indigo)); color: #fff; padding: 8px 12px; border-radius: 8px; font-weight:800; border:none; }
+
+@media (max-width: 1100px) {
+  .outreach-grid { grid-template-columns: 1fr; }
+  .right-col { width: 100%; }
+  .lower-charts { grid-template-columns: 1fr; }
+}

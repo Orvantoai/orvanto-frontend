@@ -1,0 +1,60 @@
+/* Tenants page - Dark theme (Orvanto) */
+.tenants-wrapper{padding:18px 28px 40px;min-height: calc(100vh - 88px);background:transparent}
+.tenants-header{display:flex;align-items:center;justify-content:space-between}
+.tenants-title h2{font-size:20px;font-weight:700;margin:0;color:var(--text)}
+.tenants-sub{color:var(--muted);font-size:13px;margin-top:6px}
+
+.tenants-kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;margin-top:18px}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;flex-direction:column;justify-content:space-between;min-height:86px}
+.kpi-top{display:flex;flex-direction:column}
+.kpi-label{font-weight:700;color:var(--muted);font-size:12px}
+.kpi-value{font-weight:800;font-size:20px;margin-top:6px;color:var(--text)}
+.kpi-delta{color:var(--green);font-size:13px;margin-top:10px}
+
+.tenants-main-grid{display:grid;grid-template-columns:1fr;gap:18px;margin-top:18px;align-items:start}
+
+.tenants-table-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;box-shadow:0 8px 26px rgba(2,6,23,0.6);height:calc(100vh - 260px)}
+.table-controls{display:flex;justify-content:space-between;align-items:center;padding:8px 6px}
+.search-wrap{display:flex;align-items:center;gap:8px;padding:10px 12px;background:transparent;border-radius:10px;border:1px solid var(--border)}
+.search-input{background:transparent;border:none;outline:none;color:var(--text);min-width:420px}
+.table-filters{display:flex;gap:10px;align-items:center}
+.filter-select{padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text)}
+.filter-date{padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;min-width:160px;color:var(--text)}
+.reset-link{color:var(--purple);text-decoration:none;font-weight:700}
+.table-wrap{overflow:auto;margin-top:8px;flex:1}
+.tenants-table{width:100%;border-collapse:collapse;min-width:980px;background:transparent}
+.tenants-table thead th{text-align:left;padding:16px 12px;color:var(--muted);font-weight:700;font-size:13px;border-bottom:1px solid var(--border)}
+.tenants-table tbody tr{border-bottom:1px solid rgba(255,255,255,0.02);cursor:pointer;height:64px}
+.tenants-table tbody tr:hover{background:rgba(255,255,255,0.02)}
+.tenants-table tbody tr.selected{background:linear-gradient(90deg,var(--purple),var(--indigo));opacity:0.06}
+.tenants-table td{padding:12px 12px;font-size:14px;vertical-align:middle;color:var(--text)}
+.tenant-col{display:flex;align-items:center;gap:12px}
+.avatar{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--indigo));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800}
+.tenant-meta .tenant-name{font-weight:700}
+.tenant-meta .tenant-domain{color:var(--muted);font-size:13px}
+.plan-pill{padding:6px 10px;border-radius:999px;font-weight:700;font-size:13px}
+.num-col{text-align:right;color:var(--text)}
+.domain-col{color:var(--muted)}
+.status-dot{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:700;font-size:13px}
+.status-dot.active{background:rgba(34,197,94,0.08);color:var(--green)}
+.status-dot.suspended{background:rgba(239,68,68,0.06);color:var(--red)}
+.status-dot.trial{background:rgba(245,158,11,0.06);color:var(--amber)}
+.more-btn{background:transparent;border:1px solid var(--border);padding:8px;border-radius:8px;color:var(--muted)}
+.action-menu{position:absolute;right:6px;top:38px;background:var(--card);border:1px solid var(--border);box-shadow:0 8px 28px rgba(2,6,23,0.6);border-radius:10px;min-width:180px;z-index:40;overflow:hidden}
+.action-item{display:block;width:100%;text-align:left;padding:14px 18px;border:none;background:transparent;color:var(--text);font-weight:800;font-size:16px}
+.action-item:hover{background:rgba(255,255,255,0.03)}
+.action-item.danger{color:var(--red)}
+.action-menu-root{background:var(--card);border:1px solid var(--border);box-shadow:0 12px 40px rgba(2,6,23,0.6);border-radius:12px;overflow:hidden;min-width:220px}
+.table-footer{display:flex;justify-content:space-between;align-items:center;padding:12px 6px;color:var(--muted)}
+.pagination{background:transparent;color:var(--muted);display:flex;gap:8px;align-items:center}
+.page-btn{background:transparent;border:1px solid var(--border);padding:6px 8px;border-radius:8px;color:var(--muted)}
+.page-btn.active{background:linear-gradient(90deg,var(--purple),var(--indigo));border-color:transparent;color:#fff}
+
+.tenant-details-card{display:none}
+
+.btn-danger{background:transparent;border:1px solid rgba(239,68,68,0.12);color:var(--red);padding:10px;border-radius:10px;font-weight:700}
+
+@media (max-width: 1100px){
+  .tenants-kpis{grid-template-columns:repeat(2,1fr)}
+  .tenants-main-grid{grid-template-columns:1fr}
+}

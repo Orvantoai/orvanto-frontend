@@ -1,0 +1,75 @@
+.reports-header{
+  display:flex;align-items:center;justify-content:space-between;padding:20px 28px;border-bottom:1px solid var(--border);background:linear-gradient(90deg,var(--dark) 80%,transparent 100%);
+}
+.reports-title h2{margin:0;font-size:20px;font-weight:800}
+.reports-sub{color:var(--muted);margin-top:6px}
+.range-select{background:transparent;border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px}
+.btn-export{background:linear-gradient(90deg,var(--purple),var(--indigo));color:white;padding:10px 14px;border-radius:8px;border:none;display:flex;gap:8px;align-items:center}
+
+.reports-tabs{display:flex;gap:12px;padding:14px 28px;background:transparent}
+.tab{padding:8px 12px;border-radius:8px;color:var(--muted)}
+.tab.active{color:var(--text);background:rgba(255,255,255,0.02)}
+
+.reports-container{display:flex;gap:20px;padding:18px 28px;min-height:calc(100vh - 200px);align-items:stretch}
+.left-col{flex:1;display:flex;flex-direction:column;gap:14px}
+.right-col{width:360px}
+
+.kpis-row{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:18px}
+.kpi-card{background:var(--card);padding:12px;border-radius:10px;display:flex;justify-content:space-between;align-items:center}
+.kpi-title{color:var(--muted);font-size:12px}
+.kpi-value{font-weight:800;font-size:18px}
+.kpi-delta{color:var(--muted);font-size:13px;margin-top:6px}
+.kpi-spark{width:90px}
+
+.main-grid{display:grid;grid-template-columns:1fr 360px;grid-auto-rows:min-content;gap:14px;flex:1}
+.card{background:var(--card);padding:14px;border-radius:12px;border:1px solid var(--border)}
+.card-header{font-weight:800}
+.card-sub{color:var(--muted);font-size:13px}
+.chart-large{min-height:300px;display:flex;flex-direction:column}
+.line-svg-large{width:100%;height:220px}
+.right-small{display:flex;flex-direction:column;gap:12px}
+.donut-wrap{display:flex;gap:12px;align-items:center}
+.donut-legend{flex:1}
+.donut-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0}
+.legend-color{width:12px;height:12px;border-radius:3px;margin-right:8px}
+.donut-total{text-align:center;font-weight:800}
+
+.bottom-row{grid-column:1 / -1}
+.small-cards{display:flex;gap:12px}
+.card.small{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut-row-inner{display:flex;gap:12px;align-items:center}
+.donut-meta{font-weight:700;text-align:center}
+
+.bars .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.bar-label{width:110px;color:var(--muted)}
+.bar{flex:1;background:rgba(255,255,255,0.02);height:10px;border-radius:6px;overflow:hidden}
+.bar > div{height:100%;background:linear-gradient(90deg,var(--purple),var(--indigo))}
+.bar-value{width:36px;text-align:right;color:var(--muted)}
+
+.table-card{grid-column:1 / -1;min-height:260px}
+.campaign-table{width:100%;border-collapse:collapse;margin-top:12px}
+.campaign-table th{color:var(--muted);text-align:left;padding:10px 8px;font-weight:600}
+.campaign-table td{padding:10px 8px;border-top:1px solid rgba(255,255,255,0.02)}
+.status-pill{padding:6px 8px;border-radius:8px;font-weight:700}
+.status-active{background:rgba(16,185,129,0.08);color:var(--green)}
+.status-completed{background:rgba(59,130,246,0.06);color:var(--indigo)}
+
+.insights{display:flex;flex-direction:column;gap:12px}
+.insight-pill{background:rgba(255,255,255,0.02);padding:8px;border-radius:8px;color:var(--muted);font-weight:700}
+.insight-body{color:var(--text);line-height:1.4}
+.recommendations .rec{background:rgba(255,255,255,0.02);padding:8px;border-radius:8px;margin-top:8px;color:var(--muted)}
+.btn-view{margin-top:10px;background:linear-gradient(90deg,var(--purple),var(--indigo));color:white;padding:10px;border-radius:8px;border:none;width:100%}
+
+.summary .summary-row{display:flex;justify-content:space-between;padding:8px 0;border-top:1px dashed rgba(255,255,255,0.02)}
+.muted{color:var(--muted)}
+
+.schedule .input{width:100%;padding:8px;margin-top:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text)}
+.btn-schedule{margin-top:8px;width:100%;padding:8px;border-radius:8px;background:linear-gradient(90deg,var(--purple),var(--indigo));color:white;border:none}
+
+/* Responsive tweaks */
+@media(max-width:1100px){
+  .kpis-row{grid-template-columns:repeat(3,1fr)}
+  .reports-container{flex-direction:column}
+  .right-col{width:100%}
+  .main-grid{grid-template-columns:1fr}
+}
