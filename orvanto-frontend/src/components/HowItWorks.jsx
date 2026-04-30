@@ -38,7 +38,7 @@ export default function HowItWorks() {
         </div>
 
         {/* The Radial Container */}
-        <div className="relative w-full max-w-[1200px] mx-auto min-h-[800px] md:min-h-[600px] flex flex-col md:block items-center justify-center gap-6">
+        <div className="relative w-full max-w-[1200px] mx-auto min-h-[800px] md:min-h-[600px] flex flex-col md:block items-center justify-center gap-6 mt-0">
           
           {/* Connecting SVG Lines (Desktop Only) */}
           <svg className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[500px] pointer-events-none opacity-40 z-0">
