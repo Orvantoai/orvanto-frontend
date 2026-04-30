@@ -98,14 +98,14 @@ export default function About() {
       <div className="min-h-screen bg-[#09090b] text-white overflow-x-hidden">
 
         {/* ───────── HERO SPLIT ───────── */}
-        <section className="relative w-full pt-32 pb-24 overflow-hidden">
+        <section className="about-hero-section relative w-full pt-32 pb-24 overflow-hidden">
 
           {/* Ambient blobs */}
           <div className="absolute top-0 right-0 w-[60vw] h-[60vw] max-w-[700px] max-h-[700px] bg-[var(--purple)]/10 blur-[130px] rounded-full pointer-events-none"></div>
           <div className="absolute bottom-0 left-0 w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] bg-[var(--emerald)]/8 blur-[100px] rounded-full pointer-events-none"></div>
 
           <div className="container mx-auto px-6 max-w-7xl">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="about-hero-grid grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
               {/* LEFT — Content */}
               <div className="flex flex-col items-start">
@@ -141,7 +141,7 @@ export default function About() {
                   Orvanto AI is not just a tool. It's a complete done-for-you system. We handle everything from finding prospects to booking meetings to preparing you for every call. Your only job is to show up and close.
                 </p>
 
-                <div className="flex flex-row gap-4 flex-wrap">
+                <div className="about-hero-ctas flex flex-row gap-4 flex-wrap">
                   <Link
                     to="/signup"
                     className="px-7 py-3 rounded-full bg-[var(--purple)] hover:bg-[#9333ea] text-white font-semibold text-sm transition-all duration-300 shadow-[0_0_20px_rgba(168,85,247,0.3)] hover:shadow-[0_0_30px_rgba(168,85,247,0.5)] hover:scale-105"
@@ -161,7 +161,7 @@ export default function About() {
               <div className="flex flex-col gap-8">
 
                 {/* Image */}
-                <div className="relative w-full h-[450px] md:h-[520px] rounded-[2rem] overflow-hidden border border-white/5 shadow-2xl group">
+                <div className="about-hero-image relative w-full h-[450px] md:h-[520px] rounded-[2rem] overflow-hidden border border-white/5 shadow-2xl group">
                   {/* Overlay gradient on image */}
                   <div className="absolute inset-0 bg-gradient-to-tl from-[var(--purple)]/20 via-transparent to-transparent z-10 pointer-events-none"></div>
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#09090b]/60 z-10 pointer-events-none"></div>
@@ -178,7 +178,7 @@ export default function About() {
                 </div>
 
                 {/* Why we built it this way */}
-                <div className="rounded-[1.5rem] bg-[#111116]/40 backdrop-blur-md border border-white/5 p-8 flex flex-col gap-4">
+                <div className="about-why-box rounded-[1.5rem] bg-[#111116]/40 backdrop-blur-md border border-white/5 p-8 flex flex-col gap-4">
                   <h2 className="text-lg font-semibold text-white">Why we built it this way</h2>
                   <p className="text-[#a1a1aa] text-[15px] leading-relaxed">
                     Most outreach tools give you a platform and leave you to figure out how to use it. You still need to know what to write, who to target, how often to follow up. You still need to hire someone to run it.
@@ -216,7 +216,7 @@ export default function About() {
         {/* Gradient Divider */}
         <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
 
-        <section className="relative w-full py-28 overflow-hidden">
+        <section className="team-section relative w-full py-28 overflow-hidden">
 
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] h-[70vw] max-w-[700px] bg-[var(--purple)]/5 blur-[120px] rounded-full pointer-events-none"></div>
 
@@ -224,24 +224,24 @@ export default function About() {
 
             {/* Section heading */}
             <div className="text-center mb-16">
-              <div className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.03] w-fit mx-auto mb-5">
+              <div className="team-badge flex items-center justify-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.03] w-fit mx-auto mb-5">
                 <span className="text-white/60 text-xs font-semibold tracking-wide">The team</span>
               </div>
-              <h2 className="text-3xl md:text-4xl lg:text-[48px] font-semibold text-white tracking-tight leading-tight">
+              <h2 className="team-heading text-3xl md:text-4xl lg:text-[48px] font-semibold text-white tracking-tight leading-tight">
                 We're a small team of engineers,<br />
                 <span className="bg-gradient-to-r from-[var(--purple)] to-indigo-400 bg-clip-text text-transparent">sales veterans & AI specialists</span>
               </h2>
-              <p className="text-[#a1a1aa] text-sm md:text-[15px] mt-4 max-w-2xl mx-auto leading-relaxed">
+              <p className="team-subheading text-[#a1a1aa] text-sm md:text-[15px] mt-4 max-w-2xl mx-auto leading-relaxed">
                 Based across the UK, India, and UAE — obsessed with making B2B sales work better for everyone.
               </p>
             </div>
 
             {/* Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="team-cards grid grid-cols-1 md:grid-cols-3 gap-6">
               {TEAM.map((item, i) => (
                 <div
                   key={i}
-                  className="relative rounded-[1.5rem] bg-[#111116]/60 backdrop-blur-md border border-white/5 p-8 flex flex-col gap-4 hover:-translate-y-1 hover:border-white/10 transition-all duration-300 group overflow-hidden"
+                  className="team-card relative rounded-[1.5rem] bg-[#111116]/60 backdrop-blur-md border border-white/5 p-8 flex flex-col gap-4 hover:-translate-y-1 hover:border-white/10 transition-all duration-300 group overflow-hidden"
                 >
                   {/* Top edge hover glow */}
                   <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[var(--purple)]/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -249,7 +249,7 @@ export default function About() {
                   {/* Icon + Title inline row */}
                   <div className="flex items-center gap-4">
                     <div
-                      className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center"
+                      className="team-card-icon flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center"
                       style={{ background: item.bg }}
                     >
                       <FontAwesomeIcon icon={item.icon} style={{ color: item.color }} className="text-lg" />
@@ -268,7 +268,7 @@ export default function About() {
         {/* Gradient Divider */}
         <div className="w-full h-px bg-gradient-to-r from-transparent via-[var(--purple)]/20 to-transparent"></div>
 
-        <section className="w-full py-20">
+        <section className="about-cta-section w-full py-20">
           <div className="container mx-auto px-6 max-w-3xl text-center">
             <h2 className="text-2xl md:text-3xl font-semibold text-white mb-4 tracking-tight">
               Ready to see it <span className="bg-gradient-to-r from-[var(--purple)] to-indigo-400 bg-clip-text text-transparent">work for you?</span>

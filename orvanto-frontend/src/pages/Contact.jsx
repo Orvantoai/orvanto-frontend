@@ -109,17 +109,17 @@ export default function Contact() {
         </div>
 
         <div className="container mx-auto px-6 max-w-7xl">
-          <div className="contact-grid">
+          <div className="contact-grid contact-grid-main">
             
             {/* LEFT COLUMN: INFO */}
-            <div className="contact-left">
-              <div className="contact-tag">
+            <div className="contact-left contact-info-section">
+              <div className="contact-tag contact-header-tag">
                 <img src="/favicon.svg" alt="Orvanto" className="w-5 h-5" />
                 <span>Contact Orvanto AI</span>
               </div>
               
-              <h1 className="contact-title">Get in touch</h1>
-              <p className="contact-sub">
+              <h1 className="contact-title contact-main-title">Get in touch</h1>
+              <p className="contact-sub contact-description">
                 Have questions or ready to transform your business with AI automation? 
                 Our team responds fast to ensure you stay ahead.
               </p>
@@ -172,19 +172,19 @@ export default function Contact() {
               </div>
 
               {/* Extra left block info */}
-              <div className="support-row">
-                <div className="support-hours-badge">
+              <div className="support-row support-footer-row">
+                <div className="support-hours-badge support-hours-card">
                   <i className="fa-solid fa-clock-rotate-left"></i>
                   <div>
                     <strong>Support Hours</strong>
                     <span>Mon - Fri | 9 AM - 6 PM EST</span>
                   </div>
                 </div>
-                <div className="social-connect">
-                  <a href="https://www.linkedin.com/company/orvanto-ai/" className="social-icon-btn"><i className="fa-brands fa-linkedin-in"></i></a>
+                <div className="social-connect social-links-group">
+                  <a href="https://www.linkedin.com/company/orvanto-ai/" className="social-icon-btn social-link"><i className="fa-brands fa-linkedin-in"></i></a>
                   {/* <a href="#" className="social-icon-btn"><i className="fa-brands fa-x"></i></a>
                   <a href="#" className="social-icon-btn"><i className="fa-brands fa-instagram"></i></a> */}
-                  <a href="https://wa.me/9795222283" className="social-icon-btn"><i className="fa-brands fa-whatsapp"></i></a>
+                  <a href="https://wa.me/9795222283" className="social-icon-btn social-link"><i className="fa-brands fa-whatsapp"></i></a>
                 
                 </div>
                 
@@ -192,13 +192,13 @@ export default function Contact() {
             </div>
 
             {/* RIGHT COLUMN: FORM */}
-            <div className="contact-right">
-              <div className="contact-form-card">
+            <div className="contact-right contact-form-section">
+              <div className="contact-form-card contact-form-container">
                 {!isSuccess ? (
                   <>
                     {authLoading && <div className="mb-4 text-sm text-[var(--muted)]">Checking authentication...</div>}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
-                      <div className="field">
+                    <div className="contact-form-fields grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
+                      <div className="contact-field field">
                         <label>Your Name</label>
                         <input 
                           type="text" 
@@ -208,7 +208,7 @@ export default function Contact() {
                           onChange={e => setFormData({...formData, name: e.target.value})} 
                         />
                       </div>
-                      <div className="field">
+                      <div className="contact-field field">
                         <label>Email Address</label>
                         <input 
                           type="email" 
@@ -220,7 +220,7 @@ export default function Contact() {
                       </div>
                     </div>
 
-                    <div className="field">
+                    <div className="contact-field field">
                       <label>Client ID (if applicable)</label>
                       <input 
                         type="text" 
@@ -231,7 +231,7 @@ export default function Contact() {
                       />
                     </div>
 
-                    <div className="field">
+                    <div className="contact-field field">
                       <label>Issue Type</label>
                       <select 
                         className="w-full"
@@ -249,9 +249,9 @@ export default function Contact() {
                       </select>
                     </div>
 
-                    <div className="field">
+                    <div className="contact-field field">
                       <label>Urgency Level</label>
-                      <div className="urgency-row text-[0.8rem] gap-3 flex flex-wrap mt-2">
+                      <div className="contact-urgency-row urgency-row text-[0.8rem] gap-3 flex flex-wrap mt-2">
                         <div className={`urgency-tag px-4 py-3 rounded-xl cursor-pointer transition-all border flex items-center gap-2 ${formData.urgency === 'low' ? 'bg-[var(--green)]/10 border-[var(--green)]/40 text-[var(--green)]' : 'bg-white/5 border-white/10 text-muted hover:border-white/20'}`} onClick={() => setUrgency('low')}>
                           <i className="fa-solid fa-circle text-[8px]"></i>
                           <span>Low (72h SLA)</span>
@@ -267,7 +267,7 @@ export default function Contact() {
                       </div>
                     </div>
 
-                    <div className="field">
+                    <div className="contact-field field">
                       <label>Describe your issue</label>
                       <textarea 
                         className="w-full min-h-[140px]"
@@ -277,21 +277,21 @@ export default function Contact() {
                       ></textarea>
                     </div>
 
-                    <button className="btn-submit-new" onClick={handleSubmit} disabled={isSubmitting}>
+                    <button className="btn-submit-new contact-submit-btn" onClick={handleSubmit} disabled={isSubmitting}>
                       {isSubmitting ? 'Sending...' : 'Submit'}
                     </button>
                     
             
                   </>
                 ) : (
-                  <div className="contact-success">
+                  <div className="contact-success contact-success-message">
                     <span className="contact-success-icon"></span>
                     <h2 className="text-2xl font-bold mb-4">Message received</h2>
                     <p className="text-muted leading-relaxed">
                       We'll get back to you within your selected SLA window.<br/>
                       Check your inbox for a confirmation email.
                     </p>
-                    <button className="btn-submit-new mt-8" onClick={() => setIsSuccess(false)}>
+                    <button className="btn-submit-new contact-submit-btn mt-8" onClick={() => setIsSuccess(false)}>
                       Send another message
                     </button>
                   </div>

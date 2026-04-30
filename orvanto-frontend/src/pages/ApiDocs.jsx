@@ -1,8 +1,10 @@
 // Navbar moved to App.jsx (rendered globally)
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Footer from "../components/Footer";
 
 export default function ApiDocs() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   useEffect(() => {
     // staggered reveal for sidebar and content
     const t = setTimeout(() => {
@@ -11,6 +13,7 @@ export default function ApiDocs() {
         el.style.setProperty('--i', idx);
         el.classList.add('reveal-nav');
       });
+      setSidebarOpen(false);
 
       const contentEl = document.querySelector('.api-content');
       if (contentEl) {
@@ -33,11 +36,33 @@ export default function ApiDocs() {
 
     return () => clearTimeout(t);
   }, []);
+  const handleSidebarNavClick = () => {
+    setSidebarOpen(false);
+  };
+
   return (
     <>
       {/* navbar rendered globally in App.jsx */}
-      <div className="layout">
-        <aside className="api-sidebar" dangerouslySetInnerHTML={{ __html: `
+      <div className="layout api-docs-scope">
+
+        <button
+          className="api-sidebar-toggle"
+          type="button"
+          onClick={() => setSidebarOpen(true)}
+          aria-expanded={sidebarOpen}
+          aria-controls="api-sidebar"
+        >
+          Contents
+        </button>
+
+        <div
+          className={`api-sidebar-overlay ${sidebarOpen ? "open" : ""}`}
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+
+        <aside id="api-sidebar" className={`api-sidebar ${sidebarOpen ? "open" : ""}`} dangerouslySetInnerHTML={{ __html: `
+    <button class="api-sidebar-close" onclick="document.querySelector('.api-sidebar-overlay').click()">Close ✕</button>
     <h3>Overview</h3>
     <a href="#intro" class="active">Introduction</a>
     <a href="#auth">Authentication</a>
@@ -53,7 +78,7 @@ export default function ApiDocs() {
     <a href="#limits">Rate Limits</a>
   ` }} />
 
-        <main className="api-content" dangerouslySetInnerHTML={{ __html: `
+        <main className="api-content api-docs-content" dangerouslySetInnerHTML={{ __html: `
     <h1 id="intro">API Reference</h1>
     <span class="version-badge">v2.0 — April 2025</span>
 
@@ -211,12 +236,298 @@ export default function ApiDocs() {
       </div>
       <Footer />
       <style>{`
-  ul {
-    list-style: circle;
-    margin: 24px 5px;
-    padding-left: 35px;
-  }
-`}</style>
+        .api-sidebar-toggle,
+        .api-sidebar-close {
+          display: none;
+        }
+
+        .api-docs-scope .api-sidebar {
+          padding: 40px 28px;
+        }
+
+        .api-docs-scope .api-sidebar h3 {
+          margin-top: 28px;
+          margin-bottom: 14px;
+          padding-bottom: 6px;
+          border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .api-docs-scope .api-sidebar h3:first-child {
+          margin-top: 0;
+        }
+
+        .api-docs-scope .api-sidebar a {
+          padding: 10px 16px;
+          margin-bottom: 4px;
+        }
+
+        ul {
+          list-style: circle;
+          margin: 24px 5px;
+          padding-left: 35px;
+        }
+
+        @media (max-width: 900px) {
+          .layout {
+            display: block;
+            padding: 104px 16px 24px;
+          }
+
+          .api-sidebar-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 30;
+            margin: 0 0 14px;
+            margin-top: 30px;
+            padding: 10px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(17,17,24,0.88);
+            color: var(--text);
+            font-size: 0.52rem;
+            font-weight: 700;
+            backdrop-filter: blur(18px);
+            box-shadow: 0 16px 32px rgba(2,6,23,0.35);
+          }
+
+          .api-sidebar-overlay {
+            position: fixed;
+            margin-top: 30px;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 1190;
+          }
+
+          .api-sidebar-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+          }
+
+          .api-sidebar {
+            position: fixed;
+            top: 104px;
+            left: 0;
+            width: min(88vw, 340px);
+            height: calc(100vh - 104px);
+            transform: translateX(-100%);
+            transition: transform 0.24s cubic-bezier(.2,.9,.2,1);
+            z-index: 1200;
+            border-right: 1px solid rgba(255,255,255,0.06);
+            border-radius: 0 18px 18px 0;
+            background: linear-gradient(180deg, rgba(17,17,24,0.98), rgba(10,10,15,0.96));
+            box-shadow: 0 28px 80px rgba(2,6,23,0.6);
+            padding: 24px 18px 24px !important;
+            margin-top: 12px;
+            overflow-y: auto;
+          }
+
+          .api-sidebar.open {
+            transform: translateX(0);
+          }
+
+          .api-sidebar-close {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.03);
+            color: var(--text);
+            font-size: 0.72rem;
+            font-weight: 700;
+            width: 100%;
+            cursor: pointer;
+          }
+
+          .api-sidebar h3 {
+            font-size: 0.62rem !important;
+            margin-top: 18px !important;
+            margin-bottom: 8px !important;
+            letter-spacing: 0.14em !important;
+          }
+
+          .api-sidebar a {
+            padding: 7px 10px !important;
+            font-size: 0.72rem !important;
+            border-radius: 8px !important;
+          }
+
+          .api-content {
+            padding: 22px 14px !important;
+            border-radius: 18px;
+            box-shadow: none;
+            margin-top: 0;
+          }
+
+          .api-content h1 {
+            font-size: clamp(1.8rem, 6vw, 2.4rem) !important;
+            line-height: 1.1 !important;
+          }
+
+          .api-content .version-badge {
+            font-size: 0.72rem !important;
+            padding: 6px 10px !important;
+          }
+
+          .api-content h2 {
+            font-size: 1.12rem !important;
+            margin: 26px 0 8px !important;
+          }
+
+          .api-content h3 {
+            font-size: 0.95rem !important;
+            margin: 18px 0 6px !important;
+          }
+
+          .api-content p,
+          .api-content li {
+            font-size: 0.83rem !important;
+            line-height: 1.65 !important;
+          }
+
+          .api-content ul {
+            padding-left: 20px !important;
+            margin: 18px 0 !important;
+          }
+
+          .api-content table {
+            display: table;
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            font-size: 0.76rem !important;
+            border-collapse: collapse;
+          }
+
+          .api-content table thead,
+          .api-content table tbody {
+            display: table-row-group;
+          }
+
+          .api-content table tr {
+            display: table-row;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+          }
+
+          .api-content table th,
+          .api-content table td {
+            display: table-cell;
+            padding: 10px 8px !important;
+            text-align: left;
+          }
+
+          .api-content table th {
+            font-weight: 700;
+            background: rgba(255,255,255,0.03);
+          }
+
+          .api-content pre {
+            padding: 14px !important;
+            font-size: 0.72rem !important;
+            border-radius: 10px !important;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+          }
+
+          .api-content .endpoint-bar {
+            padding: 12px 14px !important;
+            border-radius: 8px !important;
+            font-size: 0.76rem !important;
+          }
+
+          .api-content .method {
+            font-size: 0.65rem !important;
+            padding: 3px 6px !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .api-sidebar-toggle {
+            top: 96px;
+            margin-bottom: 12px;
+          }
+
+          .layout {
+            padding: 96px 12px 20px;
+          }
+
+          .api-sidebar {
+            top: 96px;
+            height: calc(100vh - 96px);
+            width: min(90vw, 320px);
+            padding: 24px 14px 20px !important;
+            margin-top: 12px;
+          }
+
+          .api-sidebar h3 {
+            font-size: 0.58rem !important;
+          }
+
+          .api-sidebar a {
+            font-size: 0.68rem !important;
+            padding: 6px 10px !important;
+          }
+
+          .api-content {
+            padding: 18px 12px !important;
+          }
+
+          .api-content h1 {
+            font-size: 1.65rem !important;
+          }
+
+          .api-content h2 {
+            font-size: 1.05rem !important;
+          }
+
+          .api-content h3 {
+            font-size: 0.88rem !important;
+          }
+
+          .api-content p,
+          .api-content li {
+            font-size: 0.8rem !important;
+          }
+
+          .api-content ul {
+            padding-left: 18px !important;
+            margin: 16px 0 !important;
+          }
+
+          .api-content table {
+            font-size: 0.7rem !important;
+            display: table;
+            width: 100%;
+          }
+
+          .api-content table th,
+          .api-content table td {
+            padding: 8px 6px !important;
+            display: table-cell;
+          }
+
+          .api-content pre {
+            padding: 12px !important;
+            font-size: 0.68rem !important;
+          }
+
+          .api-content .endpoint-bar {
+            padding: 10px 12px !important;
+            font-size: 0.7rem !important;
+          }
+
+          .api-content .method {
+            font-size: 0.6rem !important;
+            padding: 2px 4px !important;
+          }
+        }
+      `}</style>
     </>
   );
 }

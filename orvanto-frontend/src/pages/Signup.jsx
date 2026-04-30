@@ -293,7 +293,7 @@ export default function Signup() {
 
   return (
     <>
-      <div className="contact-page">
+      <div className="signup-page contact-page">
         {/* Reuse the high-fi background pattern */}
         <div className="contact-glow" style={{ background: 'radial-gradient(circle at top, rgba(168, 85, 247, 0.15), transparent 50%)' }} />
 
@@ -315,21 +315,21 @@ export default function Signup() {
         </div>
 
         <div className="container mx-auto px-6 max-w-7xl">
-          <div className="contact-grid">
+          <div className="signup-grid contact-grid">
             
             {/* LEFT COLUMN: BRANDING & BENEFITS */}
-            <div className="contact-left">
-              <div className="contact-tag">
+            <div className="signup-left contact-left mt-8">
+              <div className="signup-tag contact-tag">
                 <img src="/favicon.svg" alt="Orvanto" className="w-5 h-5" />
                 <span>Signup Orvanto AI</span>
               </div>
               
-              <h1 className="contact-title">Start your growth journey</h1>
-              <p className="contact-sub">
+              <h1 className="signup-title contact-title">Start your growth journey</h1>
+              <p className="signup-sub contact-sub">
                 Select a plan and tell us about your business. Our AI will handle the rest, from ICP research to 5-channel outreach.
               </p>
 
-              <div className="contact-info-list">
+              <div className="signup-info-list contact-info-list">
                 <div className="contact-info-card group">
                   <div className="contact-info-content">
                     <div className="contact-info-icon">
@@ -367,8 +367,8 @@ export default function Signup() {
                 </div>
               </div>
 
-              <div className="support-row">
-                <div className="support-hours-badge">
+              <div className="signup-support-row support-row">
+                <div className="support-hours-badge signup-support-card">
                   <i className="fa-solid fa-lock"></i>
                   <div>
                     <strong>Secure Onboarding</strong>
@@ -386,8 +386,8 @@ export default function Signup() {
             </div>
 
             {/* RIGHT COLUMN: MULTI-STEP FORM */}
-            <div className="contact-right">
-              <div className="contact-form-card">
+            <div className="signup-right contact-right">
+              <div className="signup-form-card contact-form-card">
                 {!isSuccess ? (
                   <>
                     <div className="signup-progress">

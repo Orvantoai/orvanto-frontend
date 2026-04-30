@@ -168,7 +168,7 @@ export default function Unsubscribe() {
         }
 
         .unsub-card {
-          background: rgba(17,17,24,0.85);
+          background: rgba(17,17,24,0.6);
           backdrop-filter: blur(14px);
           border: 1px solid rgba(255,255,255,0.08);
           border-radius: 20px;
@@ -279,6 +279,158 @@ export default function Unsubscribe() {
 .portal-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(168,85,247,0.3);
+}
+
+@media (max-width: 900px) {
+  .unsub-wrapper {
+    padding: 20px;
+    min-height: calc(100vh - 80px);
+    padding-top: 120px;
+    margin-top: 40px;
+  }
+
+  .unsub-card {
+    max-width: 420px;
+    padding: 32px 28px;
+    border-radius: 16px;
+  }
+
+  .logo-img {
+    height: 120px !important;
+  }
+
+  #form-section h1 {
+    font-size: 1.5rem !important;
+    margin-bottom: 10px !important;
+  }
+
+  #form-section p {
+    font-size: 0.88rem !important;
+    margin-bottom: 24px !important;
+    line-height: 1.5 !important;
+  }
+
+  label {
+    font-size: 0.8rem !important;
+    margin-bottom: 6px !important;
+  }
+
+  input {
+    padding: 11px 14px !important;
+    font-size: 0.85rem !important;
+  }
+
+  .btn-submit {
+    padding: 12px !important;
+    font-size: 0.9rem !important;
+  }
+
+  .success-icon {
+    margin-bottom: 16px;
+  }
+
+  .success-icon svg {
+    width: 56px !important;
+    height: 56px !important;
+  }
+
+  .success-title {
+    font-size: 1.4rem !important;
+    margin-bottom: 12px !important;
+  }
+
+  .success-text {
+    font-size: 0.88rem !important;
+    margin-bottom: 14px !important;
+    line-height: 1.6 !important;
+  }
+
+  .success-sub {
+    font-size: 0.78rem !important;
+    margin-bottom: 22px !important;
+  }
+
+  .portal-btn {
+    padding: 12px 18px !important;
+    font-size: 0.88rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .unsub-wrapper {
+    padding: 16px;
+    min-height: calc(100vh - 60px);
+    padding-top: 100px;
+  }
+
+  .unsub-card {
+    max-width: 100%;
+    padding: 24px 20px;
+    border-radius: 14px;
+    margin-top: 8px;
+  }
+
+  .logo-img {
+    height: 100px !important;
+  }
+
+  #form-section h1 {
+    font-size: 1.3rem !important;
+    margin-bottom: 8px !important;
+    font-weight: 700 !important;
+  }
+
+  #form-section p {
+    font-size: 0.8rem !important;
+    margin-bottom: 20px !important;
+    line-height: 1.5 !important;
+  }
+
+  label {
+    font-size: 0.75rem !important;
+    margin-bottom: 5px !important;
+  }
+
+  input {
+    padding: 10px 12px !important;
+    font-size: 0.8rem !important;
+  }
+
+  .btn-submit {
+    padding: 11px !important;
+    font-size: 0.85rem !important;
+  }
+
+  .success-icon {
+    margin-bottom: 14px;
+  }
+
+  .success-icon svg {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  .success-title {
+    font-size: 1.2rem !important;
+    margin-bottom: 10px !important;
+    font-weight: 700 !important;
+  }
+
+  .success-text {
+    font-size: 0.8rem !important;
+    margin-bottom: 12px !important;
+    line-height: 1.55 !important;
+  }
+
+  .success-sub {
+    font-size: 0.75rem !important;
+    margin-bottom: 18px !important;
+  }
+
+  .portal-btn {
+    padding: 10px 16px !important;
+    font-size: 0.8rem !important;
+  }
 }
       `}</style>
     </>

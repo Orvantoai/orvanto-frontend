@@ -25,6 +25,7 @@ export default function RefundPolicy() {
   const allItems = sections.flatMap(s => s.items);
 
   const [active, setActive] = useState(allItems[0]?.id ?? "welcome");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Scroll spy
   useEffect(() => {
@@ -78,6 +79,7 @@ export default function RefundPolicy() {
     if (!el) return;
     const y = el.getBoundingClientRect().top + window.scrollY - 120;
     window.scrollTo({ top: y, behavior: "smooth" });
+    setSidebarOpen(false);
   };
 
   return (
@@ -85,8 +87,31 @@ export default function RefundPolicy() {
       {/* navbar rendered globally in App.jsx */}
       <div className="layout tos-sidebar-scope">
 
+        <button
+          className="refund-sidebar-toggle"
+          type="button"
+          onClick={() => setSidebarOpen(true)}
+          aria-expanded={sidebarOpen}
+          aria-controls="refund-sidebar"
+        >
+          Contents
+        </button>
+
+        <div
+          className={`refund-sidebar-overlay ${sidebarOpen ? "open" : ""}`}
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+
         {/* ── SIDEBAR ── exact same structure as TermsOfService / ApiDocs */}
-        <aside className="api-sidebar">
+        <aside id="refund-sidebar" className={`api-sidebar refund-sidebar ${sidebarOpen ? "open" : ""}`}>
+          <button
+            className="refund-sidebar-close"
+            type="button"
+            onClick={() => setSidebarOpen(false)}
+          >
+            Close ✕
+          </button>
           {sections.map(section => (
             <div key={section.group}>
               <h3>{section.group}</h3>
@@ -201,6 +226,10 @@ export default function RefundPolicy() {
         .tos-sidebar-scope .api-sidebar > div {
           margin-bottom: 8px;
         }
+        .refund-sidebar-toggle,
+        .refund-sidebar-close {
+          display: none;
+        }
 
         /* Timeline styles */
         .timeline{display:flex;flex-direction:column;margin:24px 0}
@@ -220,6 +249,274 @@ export default function RefundPolicy() {
           list-style:circle;
           margin:24px 5px;
           padding-left:35px;}
+
+        @media (max-width: 900px) {
+          .layout {
+            display: block;
+            padding: 104px 16px 24px;
+          }
+
+          .refund-sidebar-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 30;
+            margin: 0 0 14px;
+            margin-top: 30px;
+            padding: 10px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(17,17,24,0.88);
+            color: var(--text);
+            font-size: 0.52rem;
+            font-weight: 700;
+            backdrop-filter: blur(18px);
+            box-shadow: 0 16px 32px rgba(2,6,23,0.35);
+          }
+
+          .refund-sidebar-overlay {
+            position: fixed;
+            margin-top: 30px;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 1190;
+          }
+
+          .refund-sidebar-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+          }
+
+          .refund-sidebar {
+            position: fixed;
+            top: 104px;
+            left: 0;
+            width: min(88vw, 340px);
+            height: calc(100vh - 104px);
+            transform: translateX(-100%);
+            transition: transform 0.24s cubic-bezier(.2,.9,.2,1);
+            z-index: 1200;
+            border-right: 1px solid rgba(255,255,255,0.06);
+            border-radius: 0 18px 18px 0;
+            background: linear-gradient(180deg, rgba(17,17,24,0.98), rgba(10,10,15,0.96));
+            box-shadow: 0 28px 80px rgba(2,6,23,0.6);
+            padding: 24px 18px 24px !important;
+            margin-top: 12px;
+            overflow-y: auto;
+          }
+
+          .refund-sidebar.open {
+            transform: translateX(0);
+          }
+
+          .refund-sidebar-close {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.03);
+            color: var(--text);
+            font-size: 0.72rem;
+            font-weight: 700;
+            width: 100%;
+          }
+
+          .refund-sidebar h3 {
+            font-size: 0.62rem !important;
+            margin-top: 18px !important;
+            margin-bottom: 8px !important;
+            letter-spacing: 0.14em !important;
+          }
+
+          .refund-sidebar a {
+            padding: 7px 10px !important;
+            font-size: 0.72rem !important;
+            border-radius: 8px !important;
+          }
+
+          .api-content {
+            padding: 22px 14px !important;
+            border-radius: 18px;
+            box-shadow: none;
+            margin-top: 0;
+          }
+
+          .api-content h1 {
+            font-size: clamp(1.8rem, 6vw, 2.4rem) !important;
+            line-height: 1.1 !important;
+          }
+
+          .api-content .version-badge {
+            font-size: 0.72rem !important;
+            padding: 6px 10px !important;
+          }
+
+          .api-content h2 {
+            font-size: 1.12rem !important;
+            margin: 26px 0 8px !important;
+          }
+
+          .api-content h3 {
+            font-size: 0.95rem !important;
+            margin: 18px 0 6px !important;
+          }
+
+          .api-content h4 {
+            font-size: 0.88rem !important;
+            margin: 12px 0 4px !important;
+          }
+
+          .api-content p,
+          .api-content li {
+            font-size: 0.83rem !important;
+            line-height: 1.65 !important;
+          }
+
+          .api-content ul {
+            padding-left: 20px !important;
+            margin: 18px 0 !important;
+          }
+
+          .api-content .highlight-box {
+            padding: 14px 14px !important;
+            border-radius: 12px !important;
+          }
+
+          .timeline {
+            margin: 20px 0 !important;
+          }
+
+          .tl-item {
+            gap: 16px !important;
+            padding-bottom: 20px !important;
+          }
+
+          .tl-dot {
+            width: 28px !important;
+            height: 28px !important;
+            font-size: 0.65rem !important;
+          }
+
+          .tl-content h4 {
+            font-size: 0.8rem !important;
+            margin-bottom: 3px !important;
+          }
+
+          .tl-content p {
+            font-size: 0.75rem !important;
+          }
+
+          .api-content table {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            font-size: 0.76rem !important;
+          }
+
+          .api-content pre {
+            padding: 14px !important;
+            font-size: 0.72rem !important;
+            border-radius: 10px !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .refund-sidebar-toggle {
+            top: 96px;
+            margin-bottom: 12px;
+          }
+
+          .layout {
+            padding: 96px 12px 20px;
+          }
+
+          .refund-sidebar {
+            top: 96px;
+            height: calc(100vh - 96px);
+            width: min(90vw, 320px);
+            padding: 24px 14px 20px !important;
+            margin-top: 12px;
+          }
+
+          .refund-sidebar h3 {
+            font-size: 0.58rem !important;
+          }
+
+          .refund-sidebar a {
+            font-size: 0.68rem !important;
+            padding: 6px 10px !important;
+          }
+
+          .api-content {
+            padding: 18px 12px !important;
+          }
+
+          .api-content h1 {
+            font-size: 1.65rem !important;
+          }
+
+          .api-content h2 {
+            font-size: 1.05rem !important;
+          }
+
+          .api-content h3 {
+            font-size: 0.88rem !important;
+          }
+
+          .api-content h4 {
+            font-size: 0.8rem !important;
+          }
+
+          .api-content p,
+          .api-content li {
+            font-size: 0.8rem !important;
+          }
+
+          .api-content ul {
+            padding-left: 18px !important;
+            margin: 16px 0 !important;
+          }
+
+          .api-content .highlight-box {
+            padding: 12px 12px !important;
+            font-size: 0.75rem !important;
+          }
+
+          .timeline {
+            margin: 16px 0 !important;
+          }
+
+          .tl-item {
+            gap: 14px !important;
+            padding-bottom: 18px !important;
+          }
+
+          .tl-dot {
+            width: 24px !important;
+            height: 24px !important;
+            font-size: 0.6rem !important;
+          }
+
+          .tl-content h4 {
+            font-size: 0.75rem !important;
+            margin-bottom: 2px !important;
+          }
+
+          .tl-content p {
+            font-size: 0.7rem !important;
+          }
+
+          .api-content table {
+            font-size: 0.7rem !important;
+          }
+        }
       `}</style>
     </>
   );

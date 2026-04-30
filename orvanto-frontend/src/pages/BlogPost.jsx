@@ -122,15 +122,15 @@ export default function BlogPost() {
     <div className="min-h-screen bg-[#09090b] text-white overflow-x-hidden font-inter" ref={containerRef}>
       
       {/* ───────── HERO SPLIT ───────── */}
-      <section className="relative w-full pt-32 pb-24 overflow-hidden border-b border-white/[0.02]">
+      <section className="blogpost-hero-section relative w-full pt-32 pb-24 overflow-hidden border-b border-white/[0.02]">
         <div className="absolute top-0 right-0 w-[60vw] h-[60vw] max-w-[700px] max-h-[700px] bg-[var(--purple)]/10 blur-[130px] rounded-full pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] bg-[var(--emerald)]/8 blur-[100px] rounded-full pointer-events-none"></div>
 
         <div className="container mx-auto px-6 max-w-7xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="blogpost-hero-grid grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             
             <div className="flex flex-col items-start translate-y-4">
-              <Link to="/blog" className="flex items-center gap-2 text-white/40 text-xs font-medium hover:text-white transition-colors mb-8 group">
+              <Link to="/blog" className="flex items-center gap-2 text-white/40 text-2xs font-medium hover:text-white transition-colors mb-8 group mt-18">
                 <span className="transform group-hover:-translate-x-1 transition-transform">←</span> Back to insights
               </Link>
 
@@ -160,7 +160,7 @@ export default function BlogPost() {
               </div>
             </div>
 
-            <div className="relative w-full h-[350px] md:h-[450px] lg:h-[520px] rounded-[2rem] overflow-hidden border border-white/5 shadow-2xl group">
+            <div className="blogpost-hero-image relative w-full h-[350px] md:h-[450px] lg:h-[520px] rounded-[2rem] overflow-hidden border border-white/5 shadow-2xl group">
               <div className="absolute inset-0 bg-gradient-to-tl from-[var(--purple)]/20 via-transparent to-transparent z-10 pointer-events-none"></div>
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#09090b]/60 z-10 pointer-events-none"></div>
               <img src="/blogimg.png" alt={postData.title} className="w-full h-full object-cover animate-float-slow" />
@@ -172,7 +172,7 @@ export default function BlogPost() {
       
 
       {/* ───────── MAIN CONTENT ───────── */}
-      <section className="w-full py-20">
+      <section className="blogpost-content-section w-full py-20">
         <div className="container mx-auto px-6 max-w-4xl">
           <div 
             className="blog-content prose prose-invert prose-purple max-w-none"
@@ -188,9 +188,9 @@ export default function BlogPost() {
 
       {/* ───────── BOTTOM CTA ───────── */}
       <div className="w-full h-px bg-gradient-to-r from-transparent via-[var(--purple)]/20 to-transparent"></div>
-      <section className="w-full py-24 bg-[#09090b]">
+      <section className="blogpost-cta-section w-full py-24 bg-[#09090b]">
         <div className="container mx-auto px-6 max-w-3xl text-center">
-          <h2 className="text-3xl md:text-4xl font-semibold text-white mb-6 tracking-tight">
+          <h2 className="blogpost-cta-title text-3xl md:text-4xl font-semibold text-white mb-6 tracking-tight">
              Ready to see it <span className="bg-gradient-to-r from-[var(--purple)] to-indigo-400 bg-clip-text text-transparent">work for you?</span>
           </h2>
           <p className="text-[#a1a1aa] text-lg mb-10 leading-relaxed">

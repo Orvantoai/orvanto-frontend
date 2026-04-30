@@ -460,6 +460,164 @@ select.input {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(168,85,247,0.3);
 }
+
+@media (max-width: 900px) {
+  .unsub-wrapper {
+    padding-top: 120px;
+    padding-bottom: 80px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-top: 20px;
+  }
+
+  .unsub-card {
+    max-width: 560px;
+    padding: 32px 28px;
+    border-radius: 16px;
+  }
+
+  .logo-img {
+    height: 120px !important;
+  }
+
+  .unsub-card h1 {
+    font-size: 1.5rem !important;
+    margin-bottom: 10px !important;
+  }
+
+  .unsub-card > p {
+    font-size: 0.88rem !important;
+    margin-bottom: 22px !important;
+    line-height: 1.5 !important;
+  }
+
+  .label {
+    font-size: 0.8rem !important;
+    margin-bottom: 6px !important;
+  }
+
+  .input {
+    padding: 11px 14px !important;
+    font-size: 0.85rem !important;
+  }
+
+  .btn-submit {
+    padding: 12px !important;
+    font-size: 0.9rem !important;
+  }
+
+  .unsub-card > p:last-of-type {
+    font-size: 0.75rem !important;
+    margin-top: 12px !important;
+  }
+
+  .success-icon {
+    margin-bottom: 16px;
+  }
+
+  .success-icon svg {
+    width: 56px !important;
+    height: 56px !important;
+  }
+
+  .success-title {
+    font-size: 1.4rem !important;
+    margin-bottom: 12px !important;
+  }
+
+  .success-text {
+    font-size: 0.88rem !important;
+    margin-bottom: 14px !important;
+    line-height: 1.6 !important;
+  }
+
+  .portal-btn {
+    padding: 12px 18px !important;
+    font-size: 0.88rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .unsub-wrapper {
+    padding-top: 100px;
+    padding-bottom: 60px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .unsub-card {
+    max-width: 100%;
+    padding: 24px 20px;
+    border-radius: 14px;
+    margin-top: 8px;
+  }
+
+  .logo-img {
+    height: 100px !important;
+  }
+
+  .unsub-card h1 {
+    font-size: 1.3rem !important;
+    margin-bottom: 8px !important;
+    font-weight: 700 !important;
+  }
+
+  .unsub-card > p {
+    font-size: 0.8rem !important;
+    margin-bottom: 18px !important;
+    line-height: 1.5 !important;
+  }
+
+  .label {
+    font-size: 0.75rem !important;
+    margin-bottom: 5px !important;
+  }
+
+  .input {
+    padding: 10px 12px !important;
+    font-size: 0.8rem !important;
+  }
+
+  .btn-submit {
+    padding: 11px !important;
+    font-size: 0.85rem !important;
+  }
+
+  .unsub-card > p:last-of-type {
+    font-size: 0.7rem !important;
+    margin-top: 10px !important;
+  }
+
+  .success {
+    padding: 24px 10px !important;
+  }
+
+  .success-icon {
+    margin-bottom: 14px;
+  }
+
+  .success-icon svg {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  .success-title {
+    font-size: 1.2rem !important;
+    margin-bottom: 10px !important;
+    font-weight: 700 !important;
+  }
+
+  .success-text {
+    font-size: 0.8rem !important;
+    margin-bottom: 12px !important;
+    line-height: 1.55 !important;
+  }
+
+  .portal-btn {
+    padding: 10px 16px !important;
+    font-size: 0.8rem !important;
+  }
+}
       `}</style>
     </>
   );
