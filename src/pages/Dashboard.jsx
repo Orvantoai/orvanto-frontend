@@ -410,6 +410,8 @@ export default function Dashboard() {
                         <div className="text-xs text-gray-500">{m.time}</div>
                       </div>
                     </div>
+                  )) : (
+                    <div className="text-center py-8 text-gray-500 font-medium">No meetings scheduled this week.</div>
                   )}
                 </div>
               </div>
@@ -573,8 +575,6 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
-          </div>
-
         </main>
       </div>
     </div>
