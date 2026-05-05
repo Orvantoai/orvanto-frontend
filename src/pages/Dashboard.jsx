@@ -275,166 +275,6 @@ export default function Dashboard() {
             ))}
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div className="charts-row" style={{ alignItems: 'stretch' }}>
-              {/* Outreach Performance Chart */}
-              <div style={{ flex: 2 }} className="leads-over-time-card">
-                <div className="card-heading">Outreach Performance</div>
-                <div style={{ position: 'absolute', top: 24, right: 24 }}>
-                  <button className="btn-small">Last 30 Days ▼</button>
-                </div>
-                <div style={{ padding: 12, position: 'relative' }}>
-                  <svg viewBox={`0 0 ${chartW} ${chartH}`} width="100%" height="220" preserveAspectRatio="none">
-                    { [0,0.25,0.5,0.75,1].map((g,i) => {
-                      const y = chartPad + g*(chartH-chartPad*2);
-                      const val = Math.round((1 - g) * chartMax);
-                      return (
-                        <g key={'g'+i}>
-                          <line x1={chartPad} x2={chartW-chartPad} y1={y} y2={y} stroke="rgba(255,255,255,0.03)" strokeWidth={1} />
-                          <text x={chartPad - 10} y={y + 4} fill="var(--muted)" fontSize={11} fontWeight={700} textAnchor="end">{val.toLocaleString()}</text>
-                        </g>
-                      );
-                    }) }
-                    <text x={chartPad - 34} y={chartH/2} transform={`rotate(-90 ${chartPad - 34} ${chartH/2})`} fill="var(--muted)" fontSize={12} fontWeight={700} textAnchor="middle">Counts</text>
-                    <path d={leadsPath} stroke="var(--purple)" strokeWidth={2.5} fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d={emailsPath} stroke="var(--indigo)" strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="6 4" />
-                    <path d={repliesPath} stroke="var(--green)" strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 6" />
-                    <path d={meetingsPath} stroke="var(--amber)" strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="2 6" />
-                    {leadsPoints.map((p,i) => <circle key={'l'+i} cx={p.x} cy={p.y} r={3.5} fill="var(--purple)" />)}
-                    {emailsPoints.map((p,i) => <circle key={'e'+i} cx={p.x} cy={p.y} r={3} fill="var(--indigo)" />)}
-                    {repliesPoints.map((p,i) => <circle key={'r'+i} cx={p.x} cy={p.y} r={3} fill="var(--green)" />)}
-                    {meetingsPoints.map((p,i) => <circle key={'m'+i} cx={p.x} cy={p.y} r={3} fill="var(--amber)" />)}
-                    <text x={(chartW)/2} y={chartH - 4} fill="var(--muted)" fontSize={12} fontWeight={700} textAnchor="middle">Dates</text>
-                  </svg>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, color:'var(--muted)', fontWeight:700 }}>
-                    {outreachDates.map(d => <div key={d} style={{ fontSize: 13 }}>{d}</div>)}
-                  </div>
-                </div>
-                <div className="chart-legend">
-                  <span><span style={{ color: 'var(--purple)', marginRight: 6 }}>●</span>Leads</span>
-                  <span><span style={{ color: 'var(--indigo)', marginRight: 6 }}>●</span>Emails</span>
-                  <span><span style={{ color: 'var(--green)', marginRight: 6 }}>●</span>Replies</span>
-                  <span><span style={{ color: 'var(--amber)', marginRight: 6 }}>●</span>Meetings</span>
-                </div>
-              </div>
-
-              {/* Funnel Section */}
-              <div style={{ flex: 1, margin: '0 18px' }} className="outreach-breakdown-card">
-                <div className="card-heading">Funnel Overview</div>
-                <div className="funnel-overview" style={{ padding: 12 }}>
-                  <div className="funnel-svg" style={{ width: 160, position: 'relative', zIndex: 2, marginRight: -28 }}>
-                    <svg width="160" height="100%" viewBox={`0 0 160 ${funnelViewBoxHeight}`} role="img" aria-label="Funnel Overview">
-                      <defs>
-                        <linearGradient id="g0" x1="0%" x2="100%"><stop offset="0%" stopColor="#7c3aed"/><stop offset="100%" stopColor="#6366f1"/></linearGradient>
-                        <linearGradient id="g1" x1="0%" x2="100%"><stop offset="0%" stopColor="#4f46e5"/><stop offset="100%" stopColor="#7c3aed"/></linearGradient>
-                        <linearGradient id="g2" x1="0%" x2="100%"><stop offset="0%" stopColor="#ec4899"/><stop offset="100%" stopColor="#8b5cf6"/></linearGradient>
-                        <linearGradient id="g3" x1="0%" x2="100%"><stop offset="0%" stopColor="#f59e0b"/><stop offset="100%" stopColor="#fb923c"/></linearGradient>
-                        <linearGradient id="g4" x1="0%" x2="100%"><stop offset="0%" stopColor="#f59e0b"/><stop offset="100%" stopColor="#10b981"/></linearGradient>
-                        <linearGradient id="g5" x1="0%" x2="100%"><stop offset="0%" stopColor="#10b981"/><stop offset="100%" stopColor="#059669"/></linearGradient>
-                      </defs>
-                      {funnelData.map((f, i) => {
-                        const segH = funnelSegH;
-                        const gap = funnelGap;
-                        const topW = Math.max(20, 140 * (f.count / funnelTotal));
-                        const bottomW = i < funnelData.length - 1 ? Math.max(12, 140 * (funnelData[i+1].count / funnelTotal)) : 40;
-                        const xTopLeft = (160 - topW) / 2;
-                        const xTopRight = xTopLeft + topW;
-                        const xBottomLeft = (160 - bottomW) / 2;
-                        const xBottomRight = xBottomLeft + bottomW;
-                        const yTop = i * (segH + gap);
-                        const yBottom = yTop + segH;
-                        const points = `${xTopLeft},${yTop} ${xTopRight},${yTop} ${xBottomRight},${yBottom} ${xBottomLeft},${yBottom}`;
-                        const isHovered = hoveredFunnel === i;
-                        return (
-                          <polygon
-                            key={i}
-                            points={points}
-                            fill={`url(#g${i})`}
-                            stroke="rgba(255,255,255,0.03)"
-                            strokeWidth={1}
-                            className={`funnel-seg seg-${i} ${isHovered ? 'active' : ''}`}
-                            onMouseEnter={() => setHoveredFunnel(i)}
-                            onMouseLeave={() => setHoveredFunnel(null)}
-                            style={{ 
-                              transition: 'all .18s ease', 
-                              filter: isHovered ? 'drop-shadow(0 10px 20px rgba(0,0,0,0.45))' : 'none', 
-                              opacity: hoveredFunnel === null ? 1 : (isHovered ? 1 : 0.55),
-                              animation: `funnelFadeIn 0.8s ease ${i * 0.1}s backwards`
-                            }}
-                          />
-                        )
-                      })}
-                    </svg>
-                  </div>
-                  <div className="funnel-labels" style={{ flex: 1, position: 'relative', zIndex: 1, paddingLeft: 28, ['--funnel-seg-h']: `${funnelSegH}px`, ['--funnel-gap']: `${funnelGap}px` }}>
-                    <div className="funnel-label-list">
-                      {funnelData.map((f, i) => {
-                        const pct = ((f.count / funnelTotal) * 100).toFixed(1);
-                        return (
-                          <div
-                            key={f.label}
-                            className="funnel-label-row"
-                            onMouseEnter={() => setHoveredFunnel(i)}
-                            onMouseLeave={() => setHoveredFunnel(null)}
-                          >
-                            <div className="funnel-stage">{f.label}</div>
-                            <div className="funnel-value">
-                              <div className="count">{f.count.toLocaleString()}</div>
-                              <div className="pct">{`(${pct}%)`}</div>
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Account Health Section */}
-              <div style={{ flex: 1 }} className="outreach-breakdown-card">
-                <div className="card-heading">Account Health</div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 12 }}>
-                  <div style={{ width: 120, height: 120, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                    <svg width="120" height="120" viewBox="0 0 120 120">
-                      <defs>
-                        <linearGradient id="h1" x1="0%" x2="100%" y1="0%" y2="0%">
-                          <stop offset="0%" stopColor="#10b981" />
-                          <stop offset="100%" stopColor="#06b6d4" />
-                        </linearGradient>
-                      </defs>
-                      <circle cx="60" cy="60" r="48" stroke="rgba(255,255,255,0.06)" strokeWidth="14" fill="none" />
-                      <circle 
-                        cx="60" cy="60" r="48" 
-                        stroke="url(#h1)" strokeWidth="14" strokeLinecap="round" fill="none" 
-                        strokeDasharray={`${2*Math.PI*48}`} 
-                        strokeDashoffset={`${2*Math.PI*48*(1 - healthPercent/100)}`} 
-                        transform="rotate(-90 60 60)" 
-                        style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1)' }}
-                      />
-                      <text x="60" y="58" fill="var(--text)" fontSize="20" fontWeight="800" textAnchor="middle">{healthPercent}%</text>
-                      <text x="60" y="78" fill="var(--muted)" fontSize="12" textAnchor="middle">
-                        {healthPercent >= 90 ? 'Excellent' : healthPercent >= 70 ? 'Good' : healthPercent >= 50 ? 'Fair' : 'Needs Work'}
-                      </text>
-                    </svg>
-                  </div>
-                  <div style={{ width: '100%', marginTop: 12 }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      {healthItems.map((it, i) => (
-                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <div style={{ color: 'var(--muted)', fontWeight:700 }}>{it.label}</div>
-                          <div style={{ color: it.color, fontWeight:800 }}>{it.status}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div style={{ width: '100%', marginTop: 12 }}>
-                    <button className="btn-small" style={{ width: '100%' }}>View Warmup Status</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Recent Leads Table */}
             <div className="bg-white/[0.03] border border-white/10 rounded-[32px] overflow-hidden backdrop-blur-xl">
@@ -602,6 +442,166 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div className="charts-row" style={{ alignItems: 'stretch' }}>
+              {/* Outreach Performance Chart */}
+              <div style={{ flex: 2 }} className="leads-over-time-card">
+                <div className="card-heading">Outreach Performance</div>
+                <div style={{ position: 'absolute', top: 24, right: 24 }}>
+                  <button className="btn-small">Last 30 Days ▼</button>
+                </div>
+                <div style={{ padding: 12, position: 'relative' }}>
+                  <svg viewBox={`0 0 ${chartW} ${chartH}`} width="100%" height="220" preserveAspectRatio="none">
+                    { [0,0.25,0.5,0.75,1].map((g,i) => {
+                      const y = chartPad + g*(chartH-chartPad*2);
+                      const val = Math.round((1 - g) * chartMax);
+                      return (
+                        <g key={'g'+i}>
+                          <line x1={chartPad} x2={chartW-chartPad} y1={y} y2={y} stroke="rgba(255,255,255,0.03)" strokeWidth={1} />
+                          <text x={chartPad - 10} y={y + 4} fill="var(--muted)" fontSize={11} fontWeight={700} textAnchor="end">{val.toLocaleString()}</text>
+                        </g>
+                      );
+                    }) }
+                    <text x={chartPad - 34} y={chartH/2} transform={`rotate(-90 ${chartPad - 34} ${chartH/2})`} fill="var(--muted)" fontSize={12} fontWeight={700} textAnchor="middle">Counts</text>
+                    <path d={leadsPath} stroke="var(--purple)" strokeWidth={2.5} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d={emailsPath} stroke="var(--indigo)" strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="6 4" />
+                    <path d={repliesPath} stroke="var(--green)" strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 6" />
+                    <path d={meetingsPath} stroke="var(--amber)" strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="2 6" />
+                    {leadsPoints.map((p,i) => <circle key={'l'+i} cx={p.x} cy={p.y} r={3.5} fill="var(--purple)" />)}
+                    {emailsPoints.map((p,i) => <circle key={'e'+i} cx={p.x} cy={p.y} r={3} fill="var(--indigo)" />)}
+                    {repliesPoints.map((p,i) => <circle key={'r'+i} cx={p.x} cy={p.y} r={3} fill="var(--green)" />)}
+                    {meetingsPoints.map((p,i) => <circle key={'m'+i} cx={p.x} cy={p.y} r={3} fill="var(--amber)" />)}
+                    <text x={(chartW)/2} y={chartH - 4} fill="var(--muted)" fontSize={12} fontWeight={700} textAnchor="middle">Dates</text>
+                  </svg>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, color:'var(--muted)', fontWeight:700 }}>
+                    {outreachDates.map(d => <div key={d} style={{ fontSize: 13 }}>{d}</div>)}
+                  </div>
+                </div>
+                <div className="chart-legend">
+                  <span><span style={{ color: 'var(--purple)', marginRight: 6 }}>●</span>Leads</span>
+                  <span><span style={{ color: 'var(--indigo)', marginRight: 6 }}>●</span>Emails</span>
+                  <span><span style={{ color: 'var(--green)', marginRight: 6 }}>●</span>Replies</span>
+                  <span><span style={{ color: 'var(--amber)', marginRight: 6 }}>●</span>Meetings</span>
+                </div>
+              </div>
+
+              {/* Funnel Section */}
+              <div style={{ flex: 1, margin: '0 18px' }} className="outreach-breakdown-card">
+                <div className="card-heading">Funnel Overview</div>
+                <div className="funnel-overview" style={{ padding: 12 }}>
+                  <div className="funnel-svg" style={{ width: 160, position: 'relative', zIndex: 2, marginRight: -28 }}>
+                    <svg width="160" height="100%" viewBox={`0 0 160 ${funnelViewBoxHeight}`} role="img" aria-label="Funnel Overview">
+                      <defs>
+                        <linearGradient id="g0" x1="0%" x2="100%"><stop offset="0%" stopColor="#7c3aed"/><stop offset="100%" stopColor="#6366f1"/></linearGradient>
+                        <linearGradient id="g1" x1="0%" x2="100%"><stop offset="0%" stopColor="#4f46e5"/><stop offset="100%" stopColor="#7c3aed"/></linearGradient>
+                        <linearGradient id="g2" x1="0%" x2="100%"><stop offset="0%" stopColor="#ec4899"/><stop offset="100%" stopColor="#8b5cf6"/></linearGradient>
+                        <linearGradient id="g3" x1="0%" x2="100%"><stop offset="0%" stopColor="#f59e0b"/><stop offset="100%" stopColor="#fb923c"/></linearGradient>
+                        <linearGradient id="g4" x1="0%" x2="100%"><stop offset="0%" stopColor="#f59e0b"/><stop offset="100%" stopColor="#10b981"/></linearGradient>
+                        <linearGradient id="g5" x1="0%" x2="100%"><stop offset="0%" stopColor="#10b981"/><stop offset="100%" stopColor="#059669"/></linearGradient>
+                      </defs>
+                      {funnelData.map((f, i) => {
+                        const segH = funnelSegH;
+                        const gap = funnelGap;
+                        const topW = Math.max(20, 140 * (f.count / funnelTotal));
+                        const bottomW = i < funnelData.length - 1 ? Math.max(12, 140 * (funnelData[i+1].count / funnelTotal)) : 40;
+                        const xTopLeft = (160 - topW) / 2;
+                        const xTopRight = xTopLeft + topW;
+                        const xBottomLeft = (160 - bottomW) / 2;
+                        const xBottomRight = xBottomLeft + bottomW;
+                        const yTop = i * (segH + gap);
+                        const yBottom = yTop + segH;
+                        const points = `${xTopLeft},${yTop} ${xTopRight},${yTop} ${xBottomRight},${yBottom} ${xBottomLeft},${yBottom}`;
+                        const isHovered = hoveredFunnel === i;
+                        return (
+                          <polygon
+                            key={i}
+                            points={points}
+                            fill={`url(#g${i})`}
+                            stroke="rgba(255,255,255,0.03)"
+                            strokeWidth={1}
+                            className={`funnel-seg seg-${i} ${isHovered ? 'active' : ''}`}
+                            onMouseEnter={() => setHoveredFunnel(i)}
+                            onMouseLeave={() => setHoveredFunnel(null)}
+                            style={{ 
+                              transition: 'all .18s ease', 
+                              filter: isHovered ? 'drop-shadow(0 10px 20px rgba(0,0,0,0.45))' : 'none', 
+                              opacity: hoveredFunnel === null ? 1 : (isHovered ? 1 : 0.55),
+                              animation: `funnelFadeIn 0.8s ease ${i * 0.1}s backwards`
+                            }}
+                          />
+                        )
+                      })}
+                    </svg>
+                  </div>
+                  <div className="funnel-labels" style={{ flex: 1, position: 'relative', zIndex: 1, paddingLeft: 28, ['--funnel-seg-h']: `${funnelSegH}px`, ['--funnel-gap']: `${funnelGap}px` }}>
+                    <div className="funnel-label-list">
+                      {funnelData.map((f, i) => {
+                        const pct = ((f.count / funnelTotal) * 100).toFixed(1);
+                        return (
+                          <div
+                            key={f.label}
+                            className="funnel-label-row"
+                            onMouseEnter={() => setHoveredFunnel(i)}
+                            onMouseLeave={() => setHoveredFunnel(null)}
+                          >
+                            <div className="funnel-stage">{f.label}</div>
+                            <div className="funnel-value">
+                              <div className="count">{f.count.toLocaleString()}</div>
+                              <div className="pct">{`(${pct}%)`}</div>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Account Health Section */}
+              <div style={{ flex: 1 }} className="outreach-breakdown-card">
+                <div className="card-heading">Account Health</div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 12 }}>
+                  <div style={{ width: 120, height: 120, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    <svg width="120" height="120" viewBox="0 0 120 120">
+                      <defs>
+                        <linearGradient id="h1" x1="0%" x2="100%" y1="0%" y2="0%">
+                          <stop offset="0%" stopColor="#10b981" />
+                          <stop offset="100%" stopColor="#06b6d4" />
+                        </linearGradient>
+                      </defs>
+                      <circle cx="60" cy="60" r="48" stroke="rgba(255,255,255,0.06)" strokeWidth="14" fill="none" />
+                      <circle 
+                        cx="60" cy="60" r="48" 
+                        stroke="url(#h1)" strokeWidth="14" strokeLinecap="round" fill="none" 
+                        strokeDasharray={`${2*Math.PI*48}`} 
+                        strokeDashoffset={`${2*Math.PI*48*(1 - healthPercent/100)}`} 
+                        transform="rotate(-90 60 60)" 
+                        style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1)' }}
+                      />
+                      <text x="60" y="58" fill="var(--text)" fontSize="20" fontWeight="800" textAnchor="middle">{healthPercent}%</text>
+                      <text x="60" y="78" fill="var(--muted)" fontSize="12" textAnchor="middle">
+                        {healthPercent >= 90 ? 'Excellent' : healthPercent >= 70 ? 'Good' : healthPercent >= 50 ? 'Fair' : 'Needs Work'}
+                      </text>
+                    </svg>
+                  </div>
+                  <div style={{ width: '100%', marginTop: 12 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {healthItems.map((it, i) => (
+                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div style={{ color: 'var(--muted)', fontWeight:700 }}>{it.label}</div>
+                          <div style={{ color: it.color, fontWeight:800 }}>{it.status}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div style={{ width: '100%', marginTop: 12 }}>
+                    <button className="btn-small" style={{ width: '100%' }}>View Warmup Status</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </main>
       </div>
     </div>
