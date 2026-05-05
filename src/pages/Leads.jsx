@@ -8,9 +8,9 @@ import './Leads.css';
 
 export default function Leads() {
   const [searchParams] = useSearchParams();
-  const clientId = searchParams.get('client');
+  const clientId = searchParams.get('client') || 'orvanto_self';
 
-  const [client, setClient] = useState(null);
+  const [client, setClient] = useState({});
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
@@ -23,13 +23,7 @@ export default function Leads() {
   const rowsPerPage = 10;
   const [selectedLeadId, setSelectedLeadId] = useState(null);
 
-  const sampleLeads = [
-    { id: '1', first_name: 'Alex', last_name: 'Thompson', email: 'alex@techcorp.com', company: 'TechCorp', title: 'VP of Sales', status: 'Replied', intent: 'Hot', score: 92, channels: ['linkedin','email','whatsapp'], last_activity: '2h ago', owner: 'John D.' },
-    { id: '2', first_name: 'Sophie', last_name: 'Martin', email: 'sophie@innovatelabs.io', company: 'InnovateLabs', title: 'Head of Growth', status: 'Interested', intent: 'Warm', score: 88, channels: ['email','linkedin'], last_activity: '5h ago', owner: 'Sarah M.' },
-    { id: '3', first_name: 'Michael', last_name: 'Brown', email: 'michael@dataflow.com', company: 'DataFlow', title: 'CTO', status: 'Contacted', intent: 'Warm', score: 76, channels: ['email','phone'], last_activity: '1d ago', owner: 'John D.' },
-    { id: '4', first_name: 'Emily', last_name: 'Davis', email: 'emily@growthnova.com', company: 'GrowthNova', title: 'Head of Marketing', status: 'New', intent: 'Cold', score: 71, channels: ['linkedin'], last_activity: '1d ago', owner: 'Sarah M.' },
-    { id: '5', first_name: 'James', last_name: 'Wilson', email: 'james@cloudscale.com', company: 'CloudScale', title: 'Director', status: 'Replied', intent: 'Hot', score: 69, channels: ['email','phone'], last_activity: '2d ago', owner: 'Mike R.' }
-  ];
+
 
   const loadLeads = async () => {
     setLoading(true);
@@ -120,7 +114,7 @@ export default function Leads() {
   };
 
   // Derived UI data
-  const displayLeads = (leads && leads.length > 0) ? leads : sampleLeads;
+  const displayLeads = leads || [];
   const statusCounts = {
     all: displayLeads.length,
     new: displayLeads.filter(l => ((l.status || '').toString().toLowerCase()).includes('new')).length,

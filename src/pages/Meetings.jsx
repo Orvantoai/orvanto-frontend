@@ -8,7 +8,7 @@ import './Meetings.css';
 
 export default function Meetings() {
   const [searchParams] = useSearchParams();
-  const clientId = searchParams.get('client');
+  const clientId = searchParams.get('client') || 'orvanto_self';
 
   const [client, setClient] = useState(null);
   const [meetings, setMeetings] = useState([]);
@@ -149,28 +149,34 @@ export default function Meetings() {
     return dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  // Build calendar events (from meetings or sample fallback)
-  const sampleMeetings = [
-    { id: '1', name: 'Alex Thompson', company: 'TechCorp', date: 'May 7, 2025', time: '10:00 AM', tag: 'Discovery Call', initials: 'AT' },
-    { id: '2', name: 'Sophie Martin', company: 'InnovateLabs', date: 'May 7, 2025', time: '02:30 PM', tag: 'Demo Call', initials: 'SM' },
-    { id: '3', name: 'Michael Brown', company: 'DataFlow', date: 'May 8, 2025', time: '11:00 AM', tag: 'Strategy Call', initials: 'MB' },
-    { id: '4', name: 'Emily Davis', company: 'GrowthNova', date: 'May 8, 2025', time: '03:00 PM', tag: 'Follow-up Call', initials: 'ED' },
-    { id: '5', name: 'James Wilson', company: 'CloudScale', date: 'May 9, 2025', time: '09:30 AM', tag: 'Discovery Call', initials: 'JW' }
-  ];
+  const displayMeetings = meetings || [];
+  const upcomingCount = displayMeetings.filter(m => !m.first_meeting_done).length;
+  const completedCount = displayMeetings.filter(m => m.first_meeting_done && m.status !== 'cold').length;
+  const noShowCount = 0;
+  const pipelineVal = displayMeetings.reduce((sum, m) => sum + (parseFloat(m.estimated_value_usd) || 0), 0);
+  const conversionRate = displayMeetings.length > 0 ? Math.round((displayMeetings.filter(m => m.converted).length / displayMeetings.length) * 100) : 0;
 
-  const outcomesData = [
-    { label: 'Won / Closed', value: 10, color: '#10b981' },
-    { label: 'In Progress', value: 12, color: '#6366f1' },
-    { label: 'Lost', value: 3, color: '#ef4444' },
-    { label: 'No Show', value: 3, color: '#f97316' }
-  ];
+  const wonCount = displayMeetings.filter(m => m.converted).length;
+  const lostCount = displayMeetings.filter(m => m.status === 'cold').length;
+  const inProgressCount = displayMeetings.length - wonCount - lostCount;
 
-  const sourcesData = [
-    { label: 'Email Outreach', value: 18, color: '#7c3aed' },
-    { label: 'LinkedIn Outreach', value: 6, color: '#60a5fa' },
-    { label: 'Referral / Warm Intro', value: 3, color: '#fb923c' },
-    { label: 'Other', value: 3, color: '#10b981' }
-  ];
+  const rawOutcomes = [
+    { label: 'Won / Closed', value: wonCount, color: '#10b981' },
+    { label: 'In Progress', value: inProgressCount, color: '#6366f1' },
+    { label: 'Lost', value: lostCount, color: '#ef4444' }
+  ].filter(o => o.value > 0);
+  const outcomesData = rawOutcomes.length > 0 ? rawOutcomes : [{ label: 'No Data', value: 1, color: '#334155' }];
+
+  const emailCount = displayMeetings.filter(m => m.email_replied).length;
+  const linkedinCount = displayMeetings.filter(m => m.linkedin_replied).length;
+  const otherCount = displayMeetings.length - emailCount - linkedinCount;
+
+  const rawSources = [
+    { label: 'Email Outreach', value: emailCount, color: '#7c3aed' },
+    { label: 'LinkedIn Outreach', value: linkedinCount, color: '#60a5fa' },
+    { label: 'Other', value: otherCount, color: '#10b981' }
+  ].filter(s => s.value > 0);
+  const sourcesData = rawSources.length > 0 ? rawSources : [{ label: 'No Data', value: 1, color: '#334155' }];
 
   const totalOutcomes = outcomesData.reduce((s, o) => s + o.value, 0);
   const totalSources = sourcesData.reduce((s, o) => s + o.value, 0);
@@ -211,7 +217,7 @@ export default function Meetings() {
   };
 
   const exportCSV = () => {
-    const rows = meetings && meetings.length > 0 ? meetings : sampleMeetings;
+    const rows = meetings || [];
     const header = ['Name', 'Company', 'Date', 'Time', 'Tag'];
     const csv = [header.join(',')].concat(rows.map(r => [
       (`${r.name || ''}`).replace(/,/g, ''),
@@ -239,10 +245,8 @@ export default function Meetings() {
     if (t.includes('follow')) return 'tag-followup';
     return 'tag-default';
   };
-
-  const sourceMeetings = (meetings && meetings.length > 0) ? meetings : sampleMeetings;
   const colors = ['linear-gradient(135deg,#7c3aed,#6366f1)', 'linear-gradient(135deg,#06b6d4,#06b6d4)', 'linear-gradient(135deg,#f59e0b,#fb923c)', 'linear-gradient(135deg,#10b981,#059669)'];
-  const calendarEvents = sourceMeetings.map((m, i) => {
+  const calendarEvents = displayMeetings.map((m, i) => {
     const dt = toDateObj(m);
     const dayIndex = getDayIndex(dt);
     if (dayIndex === null || dayIndex < 0 || dayIndex > 6) return null;
@@ -397,8 +401,7 @@ export default function Meetings() {
                 <div className="stat-icon"><FiCalendar /></div>
                 <div>
                   <div className="stat-title">Upcoming Meetings</div>
-                  <div className="stat-value">12</div>
-                  <div className="stat-trend">↑ 20% vs last 30 days</div>
+                  <div className="stat-value">{upcomingCount}</div>
                 </div>
               </div>
             </div>
@@ -407,8 +410,7 @@ export default function Meetings() {
                 <div className="stat-icon"><FiCheckCircle /></div>
                 <div>
                   <div className="stat-title">Completed Meetings</div>
-                  <div className="stat-value">28</div>
-                  <div className="stat-trend" style={{ color: 'var(--green)' }}>↑ 12% vs last 30 days</div>
+                  <div className="stat-value">{completedCount}</div>
                 </div>
               </div>
             </div>
@@ -417,8 +419,7 @@ export default function Meetings() {
                 <div className="stat-icon"><FiXCircle /></div>
                 <div>
                   <div className="stat-title">No-Shows</div>
-                  <div className="stat-value">3</div>
-                  <div className="stat-trend" style={{ color: 'var(--red)' }}>↓ 8% vs last 30 days</div>
+                  <div className="stat-value">{noShowCount}</div>
                 </div>
               </div>
             </div>
@@ -427,8 +428,7 @@ export default function Meetings() {
                 <div className="stat-icon"><FiBarChart2 /></div>
                 <div>
                   <div className="stat-title">Conversion Rate</div>
-                  <div className="stat-value">46%</div>
-                  <div className="stat-trend" style={{ color: 'var(--green)' }}>↑ 6% vs last 30 days</div>
+                  <div className="stat-value">{conversionRate}%</div>
                 </div>
               </div>
             </div>
@@ -437,8 +437,7 @@ export default function Meetings() {
                 <div className="stat-icon"><FiDollarSign /></div>
                 <div>
                   <div className="stat-title">Pipeline Value</div>
-                  <div className="stat-value">$328,450</div>
-                  <div className="stat-trend" style={{ color: 'var(--green)' }}>↑ 18% vs last 30 days</div>
+                  <div className="stat-value">${pipelineVal.toLocaleString()}</div>
                 </div>
               </div>
             </div>
@@ -465,18 +464,18 @@ export default function Meetings() {
 
           <div className="meetings-main-grid">
             <aside className="upcoming-list">
-              <div className="list-header">Upcoming Meetings ({sourceMeetings.length})</div>
+              <div className="list-header">Upcoming Meetings ({displayMeetings.length})</div>
               <div className="list-items">
-                { sourceMeetings.map((m, idx) => {
+                { displayMeetings.map((m, idx) => {
                   const id = m.id || `sample-${idx}`;
                   const isActive = (selectedMeetingId ? selectedMeetingId === m.id : idx === 0);
                   return (
                     <div key={id} onClick={() => setSelectedMeetingId(id)} className={`meeting-row ${isActive ? 'active-row' : ''}`}>
                       <div className="meet-left">
-                        <div className={`avatar-small ${isActive ? 'avatar-active' : ''}`}>{m.initials || (m.name||'').split(' ').map(n=>n[0]).slice(0,2).join('')}</div>
+                        <div className={`avatar-small ${isActive ? 'avatar-active' : ''}`}>{m.first_name ? m.first_name[0] : ''}{m.last_name ? m.last_name[0] : ''}</div>
                         <div style={{ marginLeft: 10 }}>
-                          <div className="meet-name">{m.name}<div className="meet-company">{m.company}</div></div>
-                          <div className="meet-meta"><span className="muted-small">{m.date}</span> • <span className="muted-small">{m.time}</span></div>
+                          <div className="meet-name">{m.first_name} {m.last_name}<div className="meet-company">{m.company}</div></div>
+                          <div className="meet-meta"><span className="muted-small">{m.meeting_booked_at ? new Date(m.meeting_booked_at).toLocaleDateString() : '—'}</span> • <span className="muted-small">{m.meeting_booked_at ? new Date(m.meeting_booked_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '—'}</span></div>
                         </div>
                       </div>
                       <div className="meet-right">

@@ -42,9 +42,12 @@ export default function Navbar() {
           <NavLink to="/about" className={({isActive}) => isActive ? 'active' : ''}>About</NavLink>
           <NavLink to="/blog" className={({isActive}) => isActive ? 'active' : ''}>Blog</NavLink>
           <NavLink to="/contact" className={({isActive}) => isActive ? 'active' : ''}>Contact</NavLink>
-          <Link to="/signup" className="btn-primary" style={{ padding: '10px 24px', fontSize: '.9rem' }}>
-            Start Free Trial →
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link to="/login" className="text-muted hover:text-white transition-colors font-medium text-sm">Log In</Link>
+            <Link to="/signup" className="btn-primary" style={{ padding: '10px 24px', fontSize: '.9rem' }}>
+              Start Free Trial →
+            </Link>
+          </div>
         </div>
         <button
           type="button"
@@ -72,6 +75,7 @@ export default function Navbar() {
         <NavLink to="/about" className={({isActive}) => isActive ? 'active' : ''}>About</NavLink>
         <NavLink to="/blog" className={({isActive}) => isActive ? 'active' : ''}>Blog</NavLink>
         <NavLink to="/contact" className={({isActive}) => isActive ? 'active' : ''}>Contact</NavLink>
+        <Link to="/login" className="text-muted text-center py-2 font-medium">Log In</Link>
         <Link to="/signup" className="btn-primary mobile-drawer-cta">
           Start Free Trial →
         </Link>

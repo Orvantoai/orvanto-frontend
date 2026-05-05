@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { supabase } from '../services/supabaseClient';
 import { FiHome, FiUsers, FiCalendar, FiMail, FiDollarSign, FiBarChart2, FiSettings, FiLogOut, FiDownload } from 'react-icons/fi';
@@ -8,7 +8,7 @@ import DashboardHeader from '../components/DashboardHeader';
 
 export default function Dashboard() {
   const [searchParams] = useSearchParams();
-  const clientId = searchParams.get('client');
+  const clientId = searchParams.get('client') || 'orvanto_self';
 
   const [client, setClient] = useState({});
   const [leads, setLeads] = useState([]);
@@ -21,10 +21,78 @@ export default function Dashboard() {
   const leadsPerPage = 5;
   const [hoveredFunnel, setHoveredFunnel] = useState(null);
 
+  const fetchDashboardData = useCallback(async () => {
+    if (!clientId) {
+      setErrorMsg('No client ID');
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const [clientResp, leadsResp] = await Promise.all([
+        supabase.from('Clients').select('*').eq('client_id', clientId).limit(1),
+        supabase.from('Leads').select('*').eq('client_id', clientId).order('created_at', { ascending: false }).limit(200)
+      ]);
+      if (clientResp.error) throw clientResp.error;
+      if (!clientResp.data || clientResp.data.length === 0) {
+        setErrorMsg('Client not found. Check your client ID in the URL.');
+        setLoading(false);
+        return;
+      }
+      setClient(clientResp.data[0]);
+      setLeads(leadsResp.data || []);
+    } catch (e) {
+      setErrorMsg('Error loading dashboard: ' + e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [clientId]);
+
   useEffect(() => {
-    // lightweight initialization; real fetches happen elsewhere
-    setTimeout(() => setLoading(false), 0);
-  }, []);
+    fetchDashboardData();
+  }, [fetchDashboardData]);
+
+  // Realtime: subscribe to Clients and Leads updates for this client
+  useEffect(() => {
+    if (!clientId) return;
+    let clientChannel = null;
+    let leadsChannel = null;
+    try {
+      clientChannel = supabase
+        .channel(`dash-clients:${clientId}`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'Clients', filter: `client_id=eq.${clientId}` }, (payload) => {
+          const rec = payload.new || payload.record || payload;
+          if (rec) setClient(prev => ({ ...(prev || {}), ...rec }));
+        })
+        .subscribe();
+      leadsChannel = supabase
+        .channel(`dash-leads:${clientId}`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'Leads', filter: `client_id=eq.${clientId}` }, (payload) => {
+          const evt = payload.eventType || payload.type || payload.event || '';
+          const newRow = payload.new || payload.record || null;
+          const oldRow = payload.old || null;
+          setLeads(prev => {
+            if (!prev) prev = [];
+            if (evt.toUpperCase().includes('INSERT')) return newRow ? [newRow, ...prev] : prev;
+            if (evt.toUpperCase().includes('UPDATE')) return prev.map(l => (l.id === (newRow && newRow.id) ? newRow : l));
+            if (evt.toUpperCase().includes('DELETE')) {
+              const idToRemove = (oldRow && oldRow.id) || (newRow && newRow.id);
+              return prev.filter(l => l.id !== idToRemove);
+            }
+            return prev;
+          });
+        })
+        .subscribe();
+    } catch (e) {
+      console.warn('Realtime subscribe failed', e);
+    }
+    return () => {
+      try {
+        if (clientChannel) supabase.removeChannel(clientChannel);
+        if (leadsChannel) supabase.removeChannel(leadsChannel);
+      } catch (e) {}
+    };
+  }, [clientId]);
 
   if (loading) {
     return (
@@ -63,33 +131,11 @@ export default function Dashboard() {
     ...leads.filter(l => l.email_sent).slice(0, 5).map(l => ({ text: `Email sent to ${l.first_name} ${l.last_name} at ${l.company}`, time: l.emailed_at, color: 'var(--purple)' }))
   ].sort((a, b) => new Date(b.time || 0) - new Date(a.time || 0)).slice(0, 10);
 
-  // Sample fallback data for UI preview when `leads` or `activities` are empty
-  const sampleLeads = [
-    { first_name: 'Alex', last_name: 'Thompson', company: 'TechCorp', status: 'Replied', intent: 'Hot', score: 92, channels: ['linkedin','email','whatsapp'], last_contact: '2h ago' },
-    { first_name: 'Sophie', last_name: 'Martin', company: 'InnovateLabs', status: 'Interested', intent: 'Warm', score: 88, channels: ['email','linkedin'], last_contact: '5h ago' },
-    { first_name: 'Michael', last_name: 'Brown', company: 'DataFlow', status: 'Contacted', intent: 'Warm', score: 76, channels: ['email','phone'], last_contact: '1d ago' },
-    { first_name: 'Emily', last_name: 'Davis', company: 'GrowthNova', status: 'New', intent: 'Cold', score: 71, channels: ['linkedin'], last_contact: '1d ago' },
-    { first_name: 'James', last_name: 'Wilson', company: 'CloudScale', status: 'Replied', intent: 'Hot', score: 69, channels: ['email','phone'], last_contact: '2d ago' },
-  ];
+  const displayLeads = leads || [];
+  const displayActivities = activities || [];
+  const displayMeetings = [];
 
-  const sampleActivities = [
-    { text: 'Meeting booked with John Smith — TechCorp', time: '2m ago', color: 'var(--purple)' },
-    { text: 'New reply from Sophie Martin — InnovateLabs', time: '15m ago', color: 'var(--green)' },
-    { text: 'Email sent to Michael Brown — DataFlow', time: '32m ago', color: 'var(--indigo)' },
-    { text: 'Lead added Sarah Wilson — GrowthNova', time: '1h ago', color: 'var(--amber)' },
-    { text: 'WhatsApp message sent to Alex Thompson — TechCorp', time: '2h ago', color: 'var(--green)' },
-  ];
-
-  const sampleMeetings = [
-    { name: 'John Smith', company: 'TechCorp', date: 'May 7, 2025', time: '10:00 AM' },
-    { name: 'Sophie Martin', company: 'InnovateLabs', date: 'May 7, 2025', time: '01:30 PM' },
-    { name: 'Michael Brown', company: 'DataFlow', date: 'May 8, 2025', time: '11:00 AM' },
-    { name: 'Emily Davis', company: 'GrowthNova', date: 'May 9, 2025', time: '03:00 PM' },
-  ];
-
-  const displayLeads = (leads && leads.length > 0) ? leads : sampleLeads;
-  const displayActivities = (activities && activities.length > 0) ? activities : sampleActivities;
-  const displayMeetings = sampleMeetings;
+  // Variables already declared above
 
   // client-side search / filter / pagination for leads
   const filteredLeads = displayLeads.filter(l => {
@@ -169,17 +215,7 @@ export default function Dashboard() {
     }
   };
 
-  const loadDashboard = async () => {
-    try {
-      setLoading(true);
-      // lightweight refresh placeholder — re-run any necessary data loads here
-      await new Promise((res) => setTimeout(res, 600));
-    } catch (e) {
-      console.error('Refresh failed', e);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const loadDashboard = () => fetchDashboardData();
 
   // Analytics: Outreach performance sample data (matches attached image look)
   const outreachDates = ['May 5', 'May 12', 'May 19', 'May 26', 'Jun 2'];

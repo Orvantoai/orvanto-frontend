@@ -31,6 +31,8 @@ import Blog from "./pages/Blog";
 import Navbar from './components/Navbar';
 import Pipeline from './pages/Pipeline';
 import Warmup from './pages/Warmup';
+import Login from './pages/Login';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -43,7 +45,7 @@ function App() {
 function AppLayout() {
   const location = useLocation();
   // Hide the global site navbar on the portal and internal dashboard routes
-  const hidePaths = ['/portal', '/dashboard', '/leads', '/meetings', '/outreach', '/pipeline', '/reports', '/warmup', '/admin'];
+  const hidePaths = ['/portal', '/dashboard', '/leads', '/meetings', '/outreach', '/pipeline', '/pipelines', '/reports', '/warmup', '/admin', '/login'];
   const hideGlobalNavbar = hidePaths.some(p => location.pathname.startsWith(p));
 
   return (
@@ -54,23 +56,29 @@ function AppLayout() {
       <div id="page-transition" className="page-transition">
         <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/welcome" element={<Welcome />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/leads" element={<Leads />} />
-        <Route path="/subscriptions" element={<Subscriptions />} />
-        <Route path="/tenants" element={<Tenants />} />
-        <Route path="/tenants/:id" element={<ViewTenant />} />
-        <Route path="/tenants/:id/subscription" element={<ManageSubscription />} />
-        <Route path="/platform-analytics" element={<PlatformAnalytics />} />
-        <Route path="/audit-logs" element={<AuditLogs />} />
-        <Route path="/error-logs" element={<ErrorLogs />} />
-        <Route path="/meetings" element={<Meetings />} />
-        <Route path="/outreach" element={<Outreach />} />
-        <Route path="/warmup" element={<Warmup />} />
-        <Route path="/reports" element={<Reports />} />
-        <Route path="/pipeline" element={<Pipeline />} />
-        <Route path="/admin" element={<Admin />} />
+        
+        {/* Protected Routes */}
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/leads" element={<ProtectedRoute><Leads /></ProtectedRoute>} />
+        <Route path="/subscriptions" element={<ProtectedRoute><Subscriptions /></ProtectedRoute>} />
+        <Route path="/tenants" element={<ProtectedRoute><Tenants /></ProtectedRoute>} />
+        <Route path="/tenants/:id" element={<ProtectedRoute><ViewTenant /></ProtectedRoute>} />
+        <Route path="/tenants/:id/subscription" element={<ProtectedRoute><ManageSubscription /></ProtectedRoute>} />
+        <Route path="/platform-analytics" element={<ProtectedRoute><PlatformAnalytics /></ProtectedRoute>} />
+        <Route path="/audit-logs" element={<ProtectedRoute><AuditLogs /></ProtectedRoute>} />
+        <Route path="/error-logs" element={<ProtectedRoute><ErrorLogs /></ProtectedRoute>} />
+        <Route path="/meetings" element={<ProtectedRoute><Meetings /></ProtectedRoute>} />
+        <Route path="/outreach" element={<ProtectedRoute><Outreach /></ProtectedRoute>} />
+        <Route path="/warmup" element={<ProtectedRoute><Warmup /></ProtectedRoute>} />
+        <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+        <Route path="/pipeline" element={<ProtectedRoute><Pipeline /></ProtectedRoute>} />
+        <Route path="/pipelines" element={<ProtectedRoute><Pipeline /></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+        
+        {/* Public Portal/Docs */}
         <Route path="/portal" element={<Portal />} />
         <Route path="/tutorial" element={<VideoPlayer />} />
         <Route path="/about" element={<About />} />

@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { supabase } from '../services/supabaseClient';
 import Sidebar from '../components/Sidebar';
 import DashboardHeader from '../components/DashboardHeader';
 import './Reports.css';
@@ -53,14 +54,33 @@ function Donut({ percent = 50, size = 140, stroke = 16, color = 'var(--purple)' 
 }
 
 export default function Reports() {
+  const [searchParams] = useSearchParams();
+  const clientId = searchParams.get('client') || 'orvanto_self';
+  const [client, setClient] = useState(null);
+  const [leads, setLeads] = useState([]);
   const [range, setRange] = useState('May 5 - Jun 4, 2025');
+
+  useEffect(() => {
+    if (!clientId) return;
+    Promise.all([
+      supabase.from('Clients').select('*').eq('client_id', clientId).limit(1),
+      supabase.from('Leads').select('*').eq('client_id', clientId).limit(500)
+    ]).then(([clientRes, leadsRes]) => {
+      if (clientRes.data && clientRes.data[0]) setClient(clientRes.data[0]);
+      if (leadsRes.data) setLeads(leadsRes.data);
+    });
+  }, [clientId]);
+
+  const fmt = (n) => Number(n || 0).toLocaleString();
+  const fmtMoney = (n) => '$' + Number(n || 0).toLocaleString();
+
   const kpis = [
-    { title: 'Leads Generated', value: '2,453', delta: '▲ 18.4% vs Apr 5 - May 4', spark: [300, 420, 360, 520, 610] },
-    { title: 'Emails Sent', value: '8,342', delta: '▲ 22.1% vs Apr 5 - May 4', spark: [1200, 1250, 1100, 1500, 1340] },
-    { title: 'Replies Received', value: '312', delta: '▲ 24.7% vs Apr 5 - May 4', spark: [30, 50, 60, 40, 80] },
-    { title: 'Meetings Booked', value: '45', delta: '▲ 28.6% vs Apr 5 - May 4', spark: [2, 6, 8, 12, 17] },
-    { title: 'Pipeline Value', value: '$328,450', delta: '▲ 35.8% vs Apr 5 - May 4', spark: [20, 40, 60, 80, 100] },
-    { title: 'Win Rate (Est.)', value: '42%', delta: '▲ 5.2% vs Apr 5 - May 4', spark: [30, 35, 40, 38, 42] }
+    { title: 'Leads Generated', value: fmt(client?.leads_generated || leads.length || 2453), delta: '▲ 18.4% vs Apr 5 - May 4', spark: [300, 420, 360, 520, 610] },
+    { title: 'Emails Sent', value: fmt(client?.emails_sent || 8342), delta: '▲ 22.1% vs Apr 5 - May 4', spark: [1200, 1250, 1100, 1500, 1340] },
+    { title: 'Replies Received', value: fmt(client?.replies_received || 312), delta: '▲ 24.7% vs Apr 5 - May 4', spark: [30, 50, 60, 40, 80] },
+    { title: 'Meetings Booked', value: fmt(client?.meetings_booked || 45), delta: '▲ 28.6% vs Apr 5 - May 4', spark: [2, 6, 8, 12, 17] },
+    { title: 'Pipeline Value', value: fmtMoney(client?.pipeline_value || 328450), delta: '▲ 35.8% vs Apr 5 - May 4', spark: [20, 40, 60, 80, 100] },
+    { title: 'Win Rate (Est.)', value: (client?.win_rate || 42) + '%', delta: '▲ 5.2% vs Apr 5 - May 4', spark: [30, 35, 40, 38, 42] }
   ];
 
   const lineValues = [500, 700, 1100, 900, 1000, 1200, 1500, 1600, 1700, 1900, 2150, 2350];

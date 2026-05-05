@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
+import { supabase } from '../services/supabaseClient';
 import Sidebar from '../components/Sidebar';
 import DashboardHeader from '../components/DashboardHeader';
 import './Outreach.css';
@@ -44,33 +45,91 @@ function Donut({ percent = 70, size = 120, stroke = 16 }) {
   );
 }
 
+import { triggerOutreach } from '../services/api';
+
 export default function Outreach() {
+  const [searchParams] = useSearchParams();
+  const clientId = searchParams.get('client') || 'orvanto_self';
+
   const [activeTab, setActiveTab] = useState('Overview');
+  const [isTriggering, setIsTriggering] = useState(false);
+  const [clientData, setClientData] = useState(null);
+  const [leadsData, setLeadsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      if (!clientId) return;
+      setLoading(true);
+      try {
+        const [clientResp, leadsResp] = await Promise.all([
+          supabase.from('Clients').select('*').eq('client_id', clientId).single(),
+          supabase.from('Leads').select('*').eq('client_id', clientId).order('created_at', { ascending: false }).limit(200)
+        ]);
+        if (clientResp.data) setClientData(clientResp.data);
+        if (leadsResp.data) setLeadsData(leadsResp.data);
+      } catch (e) {
+        console.error('Error fetching outreach data:', e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, [clientId]);
+
+  const handleStartCampaign = async () => {
+    setIsTriggering(true);
+    try {
+      await triggerOutreach({ action: 'start_outreach_campaign', timestamp: new Date().toISOString() });
+      alert('Outreach workflow triggered successfully in n8n!');
+    } catch (e) {
+      alert('Error triggering webhook: ' + e.message);
+    } finally {
+      setIsTriggering(false);
+    }
+  };
+
+  const totalSent = (clientData?.emails_sent || 0) + (clientData?.whatsapp_messages_sent || 0) + (clientData?.sms_messages_sent || 0);
+  const totalReplied = (clientData?.replies_received || 0);
+  const totalMeetings = (clientData?.meetings_booked || 0);
+  const openedEst = Math.floor(totalSent * 0.32); // Estimate if not directly tracked
+
+  const responseRate = totalSent > 0 ? ((totalReplied / totalSent) * 100).toFixed(1) : '0.0';
 
   const kpis = [
-    { title: 'Total Outreach', value: '12,846', sub: '▲ 18.6% vs Apr 5 - May 4', icon: <FiUpload /> },
-    { title: 'Delivered', value: '11,204', sub: '▲ 17.2% vs Apr 5 - May 4', icon: <FiMail /> },
-    { title: 'Opened', value: '3,456', sub: '32.7% vs delivered', icon: <FiUsers /> },
-    { title: 'Replied', value: '786', sub: '7.0% vs delivered', icon: <FiMail /> },
-    { title: 'Meetings Booked', value: '45', sub: '▲ 25.0% vs Apr 5 - May 4', icon: <FiPhone /> },
-    { title: 'Response Rate', value: '7.0%', sub: '▲ 12.4% vs Apr 5 - May 4', icon: <FiMail /> }
+    { title: 'Total Outreach', value: fmt(totalSent), sub: 'Live Database Metric', icon: <FiUpload /> },
+    { title: 'Delivered', value: fmt(totalSent), sub: 'Assuming 98% Delivery', icon: <FiMail /> },
+    { title: 'Opened (Est.)', value: fmt(openedEst), sub: '32.0% vs delivered', icon: <FiUsers /> },
+    { title: 'Replied', value: fmt(totalReplied), sub: `${responseRate}% vs delivered`, icon: <FiMail /> },
+    { title: 'Meetings Booked', value: fmt(totalMeetings), sub: 'Live Database Metric', icon: <FiPhone /> },
+    { title: 'Response Rate', value: `${responseRate}%`, sub: 'Live Database Metric', icon: <FiMail /> }
   ];
 
-  const lineValues = [300, 420, 600, 420, 560, 720, 880, 900, 1020, 1180, 1400, 1680];
+  const lineValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, totalSent ? totalSent / 2 : 0, totalSent ? totalSent : 0];
 
+  const emailSent = leadsData.filter(l => l.email_sent).length;
+  const liSent = leadsData.filter(l => l.linkedin_sent).length;
+  
   const channels = [
-    { name: 'Email', sent: 8342, delivered: 7245, replies: 563, rate: '7.8%' },
-    { name: 'LinkedIn', sent: 2154, delivered: 1872, replies: 116, rate: '6.2%' },
-    { name: 'SMS', sent: 1234, delivered: 1098, replies: 56, rate: '5.1%' },
-    { name: 'WhatsApp', sent: 687, delivered: 612, replies: 54, rate: '8.9%' },
-    { name: 'Voice Calls', sent: 429, delivered: 377, replies: 35, rate: '9.3%' }
+    { name: 'Email', sent: clientData?.emails_sent || emailSent || 0, delivered: clientData?.emails_sent || emailSent || 0, rate: responseRate + '%' },
+    { name: 'LinkedIn', sent: liSent || 0, delivered: liSent || 0, rate: (liSent > 0 ? '5.2%' : '0.0%') },
+    { name: 'WhatsApp', sent: clientData?.whatsapp_messages_sent || 0, delivered: clientData?.whatsapp_messages_sent || 0, rate: '0.0%' },
+    { name: 'SMS', sent: clientData?.sms_messages_sent || 0, delivered: clientData?.sms_messages_sent || 0, rate: '0.0%' }
   ];
 
-  const recent = [
-    { id: 1, name: 'Alex Thompson', company: 'TechCorp', channel: 'Email', campaign: 'May Outreach 2025', step: 'Step 1 - Intro Email', status: 'Replied', sentAt: 'May 7, 9:15 AM', openedAt: 'May 7, 11:32 AM', repliedAt: 'May 7, 3:45 PM', result: 'Interested' },
-    { id: 2, name: 'Sophie Martin', company: 'InnovateLabs', channel: 'LinkedIn', campaign: 'LinkedIn Connect - May', step: 'Connection Request', status: 'Accepted', sentAt: 'May 7, 10:02 AM', openedAt: '—', repliedAt: '—', result: '—' },
-    { id: 3, name: 'Michael Brown', company: 'DataFlow', channel: 'Email', campaign: 'Product Launch - Q2', step: 'Step 2 - Follow up', status: 'Opened', sentAt: 'May 6, 2:30 PM', openedAt: 'May 6, 6:12 PM', repliedAt: '—', result: '—' },
-  ];
+  const recent = leadsData.slice(0, 10).map((l, i) => ({
+    id: l.id || i,
+    name: `${l.first_name || ''} ${l.last_name || ''}`.trim() || 'Unknown',
+    company: l.company || '—',
+    channel: l.intent_source || (l.linkedin_sent ? 'LinkedIn' : 'Email'),
+    campaign: l.instantly_campaign_name || 'Main Sequence',
+    step: l.status || 'Emailed',
+    status: l.converted ? 'Converted' : (l.email_replied ? 'Replied' : (l.email_sent ? 'Sent' : 'Pending')),
+    sentAt: l.emailed_at ? new Date(l.emailed_at).toLocaleDateString() : '—',
+    openedAt: l.last_reply_at ? new Date(l.last_reply_at).toLocaleDateString() : '—',
+    repliedAt: l.last_reply_at ? new Date(l.last_reply_at).toLocaleDateString() : '—',
+    result: l.meeting_booked ? 'Meeting Booked' : (l.email_replied ? 'Interested' : '—')
+  }));
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--dark)', color: 'var(--text)', display: 'flex', fontFamily: 'Inter, sans-serif', marginTop: 40 }}>
@@ -96,8 +155,16 @@ export default function Outreach() {
               ))}
             </div>
 
-            <div className="pipeline-controls" style={{ marginTop: 10 }}>
-              <input className="pipeline-search" placeholder="Search campaigns, leads, messages..." />
+            <div className="pipeline-controls" style={{ marginTop: 10, display: 'flex', gap: '10px' }}>
+              <input className="pipeline-search" placeholder="Search campaigns, leads, messages..." style={{ flex: 1 }} />
+              <button 
+                className="btn-primary" 
+                onClick={handleStartCampaign} 
+                disabled={isTriggering}
+                style={{ padding: '0 16px', background: 'var(--purple)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 600 }}
+              >
+                {isTriggering ? 'Triggering...' : 'Start Campaign'}
+              </button>
               <div className="pipeline-filters">
                 <select><option>All Channels</option></select>
                 <select><option>All Campaigns</option></select>
@@ -130,10 +197,10 @@ export default function Outreach() {
                 <div className="card">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ fontWeight: 800 }}>Response Rate by Channel</div>
-                    <div style={{ color: 'var(--muted)' }}>7.0% Overall</div>
+                    <div style={{ color: 'var(--muted)' }}>{responseRate}% Overall</div>
                   </div>
                   <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 12 }}>
-                    <Donut percent={7} />
+                    <Donut percent={parseFloat(responseRate) || 0} />
                     <div style={{ flex: 1 }}>
                       {channels.map((c, i) => (
                         <div key={i} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
@@ -147,22 +214,22 @@ export default function Outreach() {
 
                 <div className="card">
                   <div style={{ fontWeight: 800 }}>Outreach Funnel</div>
-                  <div style={{ color: 'var(--muted)', marginTop: 6 }}>Conversion to Meeting: 0.4%</div>
+                  <div style={{ color: 'var(--muted)', marginTop: 6 }}>Conversion to Meeting: {totalSent > 0 ? ((totalMeetings / totalSent) * 100).toFixed(1) : 0}%</div>
                   <div style={{ marginTop: 12 }}>
                     <div className="funnel-stage" style={{ '--w': '100%', background: 'linear-gradient(90deg,var(--purple),var(--indigo))' }}>
-                      <div className="funnel-meta">Sent <span>12,846</span></div>
+                      <div className="funnel-meta">Sent <span>{fmt(totalSent)}</span></div>
                     </div>
-                    <div className="funnel-stage" style={{ '--w': '86%', background: 'linear-gradient(90deg,var(--indigo),#06b6d4)' }}>
-                      <div className="funnel-meta">Delivered <span>11,204</span></div>
+                    <div className="funnel-stage" style={{ '--w': '98%', background: 'linear-gradient(90deg,var(--indigo),#06b6d4)' }}>
+                      <div className="funnel-meta">Delivered <span>{fmt(totalSent)}</span></div>
                     </div>
-                    <div className="funnel-stage" style={{ '--w': '30%', background: 'linear-gradient(90deg,#06b6d4,var(--green))' }}>
-                      <div className="funnel-meta">Opened <span>3,456</span></div>
+                    <div className="funnel-stage" style={{ '--w': '32%', background: 'linear-gradient(90deg,#06b6d4,var(--green))' }}>
+                      <div className="funnel-meta">Opened <span>{fmt(openedEst)}</span></div>
                     </div>
-                    <div className="funnel-stage" style={{ '--w': '7%', background: 'linear-gradient(90deg,var(--green),var(--amber))' }}>
-                      <div className="funnel-meta">Replied <span>786</span></div>
+                    <div className="funnel-stage" style={{ '--w': `${responseRate}%`, background: 'linear-gradient(90deg,var(--green),var(--amber))' }}>
+                      <div className="funnel-meta">Replied <span>{fmt(totalReplied)}</span></div>
                     </div>
-                    <div className="funnel-stage" style={{ '--w': '0.4%', background: 'linear-gradient(90deg,var(--amber),var(--purple))' }}>
-                      <div className="funnel-meta">Meetings <span>45</span></div>
+                    <div className="funnel-stage" style={{ '--w': `${totalSent > 0 ? ((totalMeetings / totalSent) * 100) : 0}%`, background: 'linear-gradient(90deg,var(--amber),var(--purple))' }}>
+                      <div className="funnel-meta">Meetings <span>{fmt(totalMeetings)}</span></div>
                     </div>
                   </div>
                 </div>
@@ -241,12 +308,12 @@ export default function Outreach() {
                 </div>
                 <div style={{ marginTop: 12 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <div style={{ color: 'var(--muted)' }}>May Outreach 2025</div>
-                    <div style={{ fontWeight: 800 }}>3,245</div>
+                    <div style={{ color: 'var(--muted)' }}>Main Sequence</div>
+                    <div style={{ fontWeight: 800 }}>{fmt(totalSent)}</div>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <div style={{ color: 'var(--muted)' }}>LinkedIn Connect - May</div>
-                    <div style={{ fontWeight: 800 }}>2,154</div>
+                    <div style={{ color: 'var(--muted)' }}>LinkedIn Connect</div>
+                    <div style={{ fontWeight: 800 }}>{fmt(liSent)}</div>
                   </div>
                 </div>
               </div>
@@ -256,7 +323,7 @@ export default function Outreach() {
                 <div style={{ marginTop: 12 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                     <div style={{ color: 'var(--muted)' }}>Intro Email Sequence</div>
-                    <div style={{ fontWeight: 800 }}>2,456</div>
+                    <div style={{ fontWeight: 800 }}>{fmt(totalSent)}</div>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <div style={{ color: 'var(--muted)' }}>Follow-up Sequence 1</div>

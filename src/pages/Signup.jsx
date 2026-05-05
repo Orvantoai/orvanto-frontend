@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
-import { FiGlobe } from 'react-icons/fi';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
+import { FiGlobe, FiLock } from 'react-icons/fi';
+import { supabase } from '../services/supabaseClient';
 import { submitOnboarding } from '../services/api';
+import { load } from '@cashfreepayments/cashfree-js';
 import Footer from '../components/Footer';
 
 export default function Signup() {
@@ -13,12 +15,24 @@ export default function Signup() {
     company_name: '', website: '', contact_name: '', work_email: '', phone: '', industry: '', company_size: '',
     countries: [], problem_solved: '', ideal_job_titles: '', target_industries: [], target_company_sizes: [],
     target_geographies: [], unique_selling_point: '', competitor_names: '', value_proposition: '', 
-    different: '', average_deal_value: '', sales_cycle: '', cal_booking_link: '', plan: urlPlan, referral_source: ''
+    average_deal_value: '', sales_cycle: '', cal_booking_link: '', plan: urlPlan, referral_source: '',
+    password: ''
   });
+  const navigate = useNavigate();
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errors, setErrors] = useState({});
+
+  // Payment & Coupon State
+  const [couponCode, setCouponCode] = useState('');
+  const [isCouponApplying, setIsCouponApplying] = useState(false);
+  const [discountPercent, setDiscountPercent] = useState(0);
+  const [couponMessage, setCouponMessage] = useState('');
+  
+  const planPrices = { starter: 597, growth: 997, pro: 1997 };
+  const basePrice = planPrices[formData.plan] || 997;
+  const finalPrice = Math.max(0, basePrice - (basePrice * (discountPercent / 100)));
 
   const setError = (field, msg) => setErrors(prev => ({ ...prev, [field]: msg }));
   const clearError = (field) => setErrors(prev => {
@@ -164,6 +178,10 @@ export default function Signup() {
           if (setErrorsFlag) clearError(field); return true;
         }
 
+        case 'password': {
+          if (!v || v.length < 8) { if (setErrorsFlag) setError(field, 'Password must be at least 8 characters'); return false; }
+          if (setErrorsFlag) clearError(field); return true;
+        }
         case 'plan': {
           if (!v) { if (setErrorsFlag) setError(field, 'Select a plan'); return false; }
           if (setErrorsFlag) clearError(field); return true;
@@ -185,6 +203,7 @@ export default function Signup() {
       validateField('contact_name', formData.contact_name, setErrorsFlag) &&
       validateField('work_email', formData.work_email, setErrorsFlag) &&
       validateField('phone', formData.phone, setErrorsFlag) &&
+      validateField('password', formData.password, setErrorsFlag) &&
       validateField('industry', formData.industry, setErrorsFlag) &&
       validateField('company_size', formData.company_size, setErrorsFlag) &&
       validateField('countries', formData.countries, setErrorsFlag)
@@ -264,17 +283,144 @@ export default function Signup() {
     setFormData(prev => ({...prev, plan}));
   };
 
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setIsCouponApplying(true);
+    setCouponMessage('');
+    try {
+      const { data, error } = await supabase
+        .from('Coupons')
+        .select('discount_percent, is_active')
+        .eq('code', couponCode.trim().toUpperCase())
+        .single();
+        
+      if (error || !data || !data.is_active) {
+        setCouponMessage('Invalid or expired coupon code.');
+        setDiscountPercent(0);
+      } else {
+        setDiscountPercent(data.discount_percent);
+        setCouponMessage(`${data.discount_percent}% discount applied!`);
+      }
+    } catch (err) {
+      setCouponMessage('Error verifying coupon.');
+    }
+    setIsCouponApplying(false);
+  };
+
   const submitForm = async () => {
     // final validation (step 4)
-    if (!validateStep4(true)) return;
+    if (!validateStep1(true) || !validateStep2(true) || !validateStep3(true) || !validateStep4(true)) {
+      alert('Please check all steps for errors.');
+      return;
+    }
     setIsSubmitting(true);
     try {
-      await submitOnboarding(formData);
+      let cashfreeOrderId = null;
+
+      // --- PAYMENT FLOW ---
+      if (finalPrice > 0) {
+        // 1. Call Backend to create Cashfree Order
+        const webhookResponse = await fetch('https://primary-production-809296.up.railway.app/webhook/wf13a-create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            plan: formData.plan,
+            amount: finalPrice,
+            email: formData.work_email,
+            phone: formData.phone,
+            name: formData.contact_name || formData.company_name
+          })
+        });
+        const orderData = await webhookResponse.json();
+
+        if (!webhookResponse.ok || !orderData?.success || !orderData?.payment_session_id) {
+          throw new Error('Could not initialize payment session. Please try again.');
+        }
+
+        // 2. Open Cashfree Checkout Modal
+        const cashfree = await load({ mode: 'production' });
+        const checkoutOptions = {
+          paymentSessionId: orderData.payment_session_id,
+          redirectTarget: '_modal',
+        };
+
+        const result = await cashfree.checkout(checkoutOptions);
+        if (result.error) {
+          throw new Error(result.error.message || 'Payment was cancelled or failed.');
+        }
+
+        cashfreeOrderId = orderData.order_id;
+      }
+
+      // --- ACCOUNT CREATION FLOW ---
+
+      // 1. Sign up user in Supabase Auth
+      const { data: authData, error: authErr } = await supabase.auth.signUp({
+        email: formData.work_email,
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.contact_name,
+            company: formData.company_name,
+          }
+        }
+      });
+
+      if (authErr) throw authErr;
+
+      // 2. Create Client record in Supabase
+      const clientId = formData.company_name.toLowerCase().replace(/[^a-z0-9]/g, '_') + '_' + Math.floor(Math.random() * 1000);
+
+      const { error: clientErr } = await supabase.from('Clients').insert({
+        client_id: clientId,
+        name: formData.company_name,
+        website: formData.website,
+        contact_name: formData.contact_name,
+        contact_email: formData.work_email,
+        phone: formData.phone,
+        target_industry: formData.industry,
+        plan: formData.plan,
+        value_proposition: formData.value_proposition,
+        onboarding_complete: true,
+        status: 'active',
+        auth_user_id: authData?.user?.id
+      });
+
+      if (clientErr) {
+        console.error('Client creation failed, but auth succeeded:', clientErr);
+      }
+
+      // 3. Record Payment if applicable
+      if (cashfreeOrderId) {
+        await supabase.from('Payments').insert({
+          order_id: cashfreeOrderId,
+          client_id: clientId,
+          amount: finalPrice,
+          status: 'success'
+        });
+      } else if (finalPrice === 0 && discountPercent === 100) {
+        await supabase.from('Payments').insert({
+          order_id: 'FREE_' + clientId,
+          client_id: clientId,
+          amount: 0,
+          status: 'success'
+        });
+      }
+
+      // 4. Trigger n8n webhook
+      await submitOnboarding({ ...formData, client_id: clientId });
+
       setIsSuccess(true);
       setIsSubmitting(false);
+
+      // Auto-redirect to dashboard after a delay
+      setTimeout(() => {
+        navigate(`/dashboard?client=${clientId}`);
+      }, 3000);
+
     } catch (err) {
-      // show error and don't mark success
-      alert('Submission failed. Try again.');
+      console.error('Submission failed:', err);
+      alert('Signup failed: ' + err.message);
       setIsSubmitting(false);
     }
   };
@@ -429,6 +575,15 @@ export default function Signup() {
                             <input type="email" id="work_email" placeholder="john@yourcompany.com" value={formData.work_email} onChange={handleInputChange} onBlur={handleBlur} />
                             {errors.work_email && <div className="text-rose-400 text-sm mt-2">{errors.work_email}</div>}
                           </div>
+                        </div>
+
+                        <div className="field mb-8">
+                          <label className="required">Create Password</label>
+                          <div className="relative">
+                            <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
+                            <input type="password" id="password" className="pl-12" style={{ paddingLeft: '3rem' }} placeholder="Min. 8 characters" value={formData.password} onChange={handleInputChange} onBlur={handleBlur} />
+                          </div>
+                          {errors.password && <div className="text-rose-400 text-sm mt-2">{errors.password}</div>}
                         </div>
 
                           <div className="field">
@@ -648,24 +803,36 @@ export default function Signup() {
                         </div>
 
                         <div className="field">
-                          <label className="required">Card Details (Secured via Skydo)</label>
-                          <div className="text-xs text-muted mb-2">Card collection should be handled by Stripe/checkout in production — do not handle card numbers directly.</div>
-                          <div className="p-4 rounded-xl bg-white/[0.02] border border-white/10">
-                            <div className="field">
-                              <label className="text-[0.7rem] uppercase required">Card Number</label>
-                              <input type="text" placeholder="4242 4242 4242 4242" className="!bg-transparent !border-none !p-0" />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4 mt-4">
-                              <div className="field mb-0">
-                                <label className="text-[0.7rem] uppercase required">Expiry</label>
-                                <input type="text" placeholder="MM/YY" className="!bg-transparent !border-none !p-0" />
-                              </div>
-                              <div className="field mb-0">
-                                <label className="text-[0.7rem] uppercase required">CVC</label>
-                                <input type="text" placeholder="123" className="!bg-transparent !border-none !p-0" />
-                              </div>
-                            </div>
+                          <label>Have a coupon code?</label>
+                          <div className="flex gap-2">
+                            <input 
+                              type="text" 
+                              placeholder="Enter code" 
+                              value={couponCode} 
+                              onChange={(e) => setCouponCode(e.target.value)}
+                              className="!mb-0 uppercase"
+                            />
+                            <button 
+                              className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-all font-semibold"
+                              onClick={handleApplyCoupon}
+                              disabled={isCouponApplying}
+                            >
+                              {isCouponApplying ? '...' : 'Apply'}
+                            </button>
                           </div>
+                          {couponMessage && (
+                            <div className={`text-sm mt-2 ${discountPercent > 0 ? 'text-[var(--green)]' : 'text-rose-400'}`}>
+                              {couponMessage}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="p-4 rounded-xl bg-white/[0.02] border border-white/10 flex justify-between items-center mt-6">
+                          <div>
+                            <div className="text-sm text-muted">Total Due Today</div>
+                            {discountPercent > 0 && <div className="text-xs text-[var(--green)]">({discountPercent}% off applied)</div>}
+                          </div>
+                          <div className="text-2xl font-bold">${finalPrice}</div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 mt-8">

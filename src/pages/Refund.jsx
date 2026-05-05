@@ -7,19 +7,25 @@ export default function RefundPolicy() {
 
   // Sidebar sections — same grouped h3 + a pattern as TermsOfService / ApiDocs
   const sections = [
-    { group: "Overview",   items: [{ id: "welcome",  label: "Our Guarantee" }] },
-    { group: "Policy",     items: [
-      { id: "1-free-trial--days-17",                label: "Free Trial"           },
-      { id: "2-after-day-8--standard-policy",       label: "After Day 8"          },
-      { id: "3-the-3-meeting-guarantee-in-detail",  label: "3-Meeting Guarantee"  },
-    ]},
-    { group: "Cancellation", items: [
-      { id: "4-what-happens-when-you-cancel",       label: "When You Cancel"      },
-      { id: "5-exceptional-circumstances",          label: "Exceptions"           },
-    ]},
-    { group: "Support", items: [
-      { id: "6-contact",                            label: "Contact"              },
-    ]},
+    { group: "Overview", items: [{ id: "welcome", label: "Our Guarantee" }] },
+    {
+      group: "Policy", items: [
+        { id: "1-free-trial--days-17", label: "Free Trial" },
+        { id: "2-after-day-8--standard-policy", label: "After Day 8" },
+        { id: "3-the-3-meeting-guarantee-in-detail", label: "3-Meeting Guarantee" },
+      ]
+    },
+    {
+      group: "Cancellation", items: [
+        { id: "4-what-happens-when-you-cancel", label: "When You Cancel" },
+        { id: "5-exceptional-circumstances", label: "Exceptions" },
+      ]
+    },
+    {
+      group: "Support", items: [
+        { id: "6-contact", label: "Contact" },
+      ]
+    },
   ];
 
   const allItems = sections.flatMap(s => s.items);
@@ -130,7 +136,8 @@ export default function RefundPolicy() {
         </aside>
 
         {/* ── MAIN CONTENT ── */}
-        <main className="api-content" dangerouslySetInnerHTML={{ __html: `
+        <main className="api-content" dangerouslySetInnerHTML={{
+          __html: `
   <h1 id="welcome">Refund <span style="background:linear-gradient(90deg,#ff95b4,#a855f7);-webkit-background-clip:text;background-clip:text;color:transparent">Policy</span></h1>
   <span class="version-badge">April 2025 — Sanfy Consultancy Services Pvt. Ltd.</span>
 
@@ -230,6 +237,32 @@ export default function RefundPolicy() {
         .refund-sidebar-close {
           display: none;
         }
+
+        /* Desktop Layout Fix */
+.layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px; /* or 20px if you want spacing */
+}
+
+/* Sidebar fixed width */
+.api-sidebar {
+  width: 260px;
+  min-width: 260px;
+  position: sticky;
+  top: 104px; /* matches navbar offset */
+  height: calc(100vh - 104px);
+  overflow-y: auto;
+}
+
+/* Main content should take remaining space */
+.api-content {
+  flex: 1;
+  max-width: 100%;
+}
+  .api-content {
+  padding-left: 40px;
+}
 
         /* Timeline styles */
         .timeline{display:flex;flex-direction:column;margin:24px 0}

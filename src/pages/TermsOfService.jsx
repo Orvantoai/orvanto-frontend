@@ -7,26 +7,32 @@ export default function TermsOfService() {
 
   // Sidebar sections — mirrors ApiDocs h3 group + a link pattern
   const sections = [
-    { group: "Overview",   items: [{ id: "welcome",        label: "Introduction"           }] },
-    { group: "Subscription", items: [
-      { id: "1-the-service",          label: "The Service"         },
-      { id: "2-free-trial",           label: "Free Trial"          },
-      { id: "3-payment-terms",        label: "Payment Terms"       },
-    ]},
-    { group: "Guarantees & Policy", items: [
-      { id: "4-the-3-meeting-guarantee", label: "3-Meeting Guarantee" },
-      { id: "5-cancellation-policy",     label: "Cancellation"        },
-      { id: "6-acceptable-use",          label: "Acceptable Use"      },
-    ]},
-    { group: "Legal", items: [
-      { id: "7-data-and-privacy",       label: "Data & Privacy"     },
-      { id: "8-intellectual-property",  label: "Intellectual Property" },
-      { id: "9-limitation-of-liability",label: "Liability"          },
-      { id: "10-service-availability",  label: "Availability"       },
-      { id: "11-governing-law",         label: "Governing Law"      },
-      { id: "12-changes-to-terms",      label: "Changes to Terms"   },
-      { id: "13-contact",               label: "Contact"            },
-    ]},
+    { group: "Overview", items: [{ id: "welcome", label: "Introduction" }] },
+    {
+      group: "Subscription", items: [
+        { id: "1-the-service", label: "The Service" },
+        { id: "2-free-trial", label: "Free Trial" },
+        { id: "3-payment-terms", label: "Payment Terms" },
+      ]
+    },
+    {
+      group: "Guarantees & Policy", items: [
+        { id: "4-the-3-meeting-guarantee", label: "3-Meeting Guarantee" },
+        { id: "5-cancellation-policy", label: "Cancellation" },
+        { id: "6-acceptable-use", label: "Acceptable Use" },
+      ]
+    },
+    {
+      group: "Legal", items: [
+        { id: "7-data-and-privacy", label: "Data & Privacy" },
+        { id: "8-intellectual-property", label: "Intellectual Property" },
+        { id: "9-limitation-of-liability", label: "Liability" },
+        { id: "10-service-availability", label: "Availability" },
+        { id: "11-governing-law", label: "Governing Law" },
+        { id: "12-changes-to-terms", label: "Changes to Terms" },
+        { id: "13-contact", label: "Contact" },
+      ]
+    },
   ];
 
   const allItems = sections.flatMap(s => s.items);
@@ -138,7 +144,8 @@ export default function TermsOfService() {
         </aside>
 
         {/* ── MAIN CONTENT ── */}
-        <main className="api-content" dangerouslySetInnerHTML={{ __html: `
+        <main className="api-content" dangerouslySetInnerHTML={{
+          __html: `
   <h1 id="welcome">Terms of <span style="background:linear-gradient(90deg,#ff95b4,#a855f7);-webkit-background-clip:text;background-clip:text;color:transparent">Services</span></h1>
   <span class="version-badge">April 2025 — Sanfy Consultancy Services Pvt. Ltd.</span>
 
@@ -252,11 +259,38 @@ export default function TermsOfService() {
         .tos-sidebar-close {
           display: none;
         }
-        ul {
+        /* Scope list styles to this page only to avoid affecting desktop across the site */
+        .tos-sidebar-scope .api-content ul {
           list-style: circle;
           margin: 24px 5px;
           padding-left: 35px;
         }
+
+        /* Desktop Layout Fix */
+.layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px; /* or 20px if you want spacing */
+}
+
+/* Sidebar fixed width */
+.api-sidebar {
+  width: 260px;
+  min-width: 260px;
+  position: sticky;
+  top: 104px; /* matches navbar offset */
+  height: calc(100vh - 104px);
+  overflow-y: auto;
+}
+
+/* Main content should take remaining space */
+.api-content {
+  flex: 1;
+  max-width: 100%;
+}
+  .api-content {
+  padding-left: 40px;
+}
 
         @media (max-width: 900px) {
           .layout {

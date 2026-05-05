@@ -8,7 +8,7 @@ import './Pipeline.css';
 
 export default function Pipeline() {
   const [searchParams] = useSearchParams();
-  const clientId = searchParams.get('client');
+  const clientId = searchParams.get('client') || 'orvanto_self';
 
   const [client, setClient] = useState(null);
   const [leads, setLeads] = useState([]);

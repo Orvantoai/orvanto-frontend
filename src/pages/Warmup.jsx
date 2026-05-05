@@ -1,5 +1,6 @@
-import { useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { supabase } from '../services/supabaseClient';
 import Sidebar from '../components/Sidebar';
 import DashboardHeader from '../components/DashboardHeader';
 import './Warmup.css';
@@ -141,14 +142,27 @@ function WarmupTimeline({ series = [], highlightIndex = 9 }) {
 }
 
 export default function Warmup() {
+  const [searchParams] = useSearchParams();
+  const clientId = searchParams.get('client') || 'orvanto_self';
+  const [client, setClient] = useState(null);
   const [range] = useState('May 5 - May 18, 2025');
 
+  useEffect(() => {
+    if (!clientId) return;
+    supabase.from('Clients').select('*').eq('client_id', clientId).limit(1).then(({ data }) => {
+      if (data && data[0]) setClient(data[0]);
+    });
+  }, [clientId]);
+
+  const warmupDay = client?.warmup_day || 0;
+  const healthScore = client?.health_score || 92;
+
   const kpis = [
-    { title: 'Domains Active', value: '3 / 3', sub: 'All domains are active', spark: [1, 1, 1, 1] },
-    { title: 'Overall Health Score', value: '92 / 100', sub: 'Excellent', spark: [80, 85, 90, 92] },
-    { title: 'Emails Sent Today', value: '248', sub: '▲ 18.6% vs yesterday', spark: [120, 160, 200, 248] },
-    { title: 'Positive Replies', value: '32', sub: '▲ 25.0% vs yesterday', spark: [4, 8, 16, 32] },
-    { title: 'Spam Complaints', value: '0', sub: 'Great! No complaints', spark: [0, 0, 0, 0] }
+    { title: 'Domains Active', value: `${client?.domains_active || 3} / ${client?.domains_total || 3}`, sub: 'All domains are active', spark: [1, 1, 1, 1] },
+    { title: 'Overall Health Score', value: `${healthScore} / 100`, sub: healthScore >= 90 ? 'Excellent' : healthScore >= 70 ? 'Good' : 'Needs Attention', spark: [80, 85, 90, healthScore] },
+    { title: 'Emails Sent Today', value: String(client?.emails_sent_today || 248), sub: '▲ 18.6% vs yesterday', spark: [120, 160, 200, client?.emails_sent_today || 248] },
+    { title: 'Positive Replies', value: String(client?.positive_replies || 32), sub: '▲ 25.0% vs yesterday', spark: [4, 8, 16, client?.positive_replies || 32] },
+    { title: 'Spam Complaints', value: String(client?.spam_complaints || 0), sub: 'Great! No complaints', spark: [0, 0, 0, client?.spam_complaints || 0] }
   ];
 
   const domains = [

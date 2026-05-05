@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../services/supabaseClient';
 import {
   FiHome, FiUsers, FiCalendar, FiMail, FiDollarSign, FiLogOut, FiBarChart2, FiZap,
   FiExternalLink, FiSettings, FiHelpCircle, FiUser, FiCreditCard, FiTag, FiKey,
@@ -7,7 +8,13 @@ import {
 import '../pages/Dashboard.css';
 
 export default function Sidebar({ client, clientId, active = 'Overview', admin = false, compact = false }) {
+  const navigate = useNavigate();
   const linkPath = (p) => (clientId ? `${p}?client=${clientId}` : p);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/login');
+  };
 
   const adminGroups = [
     { title: null, items: [ { icon: FiHome, label: 'Overview', display: 'Dashboard', path: linkPath('/dashboard'), color: 'var(--purple)' } ] },
@@ -132,7 +139,7 @@ export default function Sidebar({ client, clientId, active = 'Overview', admin =
         </div>
       </div>
 
-      <div className="logout">
+      <div className="logout" onClick={handleLogout} style={{ cursor: 'pointer' }}>
         <FiLogOut size={18} color="var(--muted)" /> Logout
       </div>
     </aside>
