@@ -7,9 +7,18 @@ import {
   faGear,
   faDownload,
   faMagnifyingGlass,
-  faArrowUpRightFromSquare
+  faArrowUpRightFromSquare,
+  faMessage,
+  faCalendarCheck,
+  faShieldHalved,
+  faCircleCheck,
+  faEnvelope,
+  faPhone,
+  faCheckCircle,
+  faCircleXmark
 } from '@fortawesome/free-solid-svg-icons';
-
+import { FiLinkedin, FiExternalLink } from 'react-icons/fi';
+import './Portal.css';
 
 export default function Portal() {
   const [searchParams] = useSearchParams();
@@ -80,7 +89,7 @@ export default function Portal() {
     const isAtFull = typedHeading === fullText;
     const isAtEmpty = typedHeading.length === 0;
     const speed = headingDeleting ? 45 : 80;
-    const pause = isAtFull ? 1200 : isAtEmpty && headingDeleting ? 350 : speed;
+    const pause = isAtFull ? 2500 : isAtEmpty && headingDeleting ? 500 : speed;
 
     const timer = setTimeout(() => {
       if (isAtFull && !headingDeleting) {
@@ -100,18 +109,13 @@ export default function Portal() {
 
     return () => clearTimeout(timer);
   }, [clientData, typedHeading, headingDeleting]);
-const gradientText = {
-  background: "linear-gradient(90deg,#ff95b4,#a855f7)",
-  WebkitBackgroundClip: "text",
-  backgroundClip: "text",
-  color: "transparent"
-};
+
   async function loadPortal(cId) {
     try {
       const [cResp, lResp, mResp] = await Promise.all([
         supabase.from('Clients').select('*').eq('client_id', cId).limit(1),
-        supabase.from('Leads').select('*').eq('client_id', cId).order('created_at', { ascending: false }).limit(50),
-        supabase.from('meetings').select('*').eq('client_id', cId).order('meeting_at', { ascending: false }).limit(5)
+        supabase.from('Leads').select('*').eq('client_id', cId).order('created_at', { ascending: false }).limit(100),
+        supabase.from('meetings').select('*').eq('client_id', cId).order('meeting_at', { ascending: false }).limit(10)
       ]);
 
       if (cResp.error) throw cResp.error;
@@ -143,8 +147,17 @@ const gradientText = {
     }).eq('client_id', clientId);
   };
 
-  const toggleSMS = () => setClientData({...clientData, sms_enabled: !clientData.sms_enabled});
-  const toggleWA = () => setClientData({...clientData, whatsapp_enabled: !clientData.whatsapp_enabled});
+  const toggleSMS = async () => {
+    const newValue = !clientData.sms_enabled;
+    setClientData({...clientData, sms_enabled: newValue});
+    await supabase.from('Clients').update({ sms_enabled: newValue }).eq('client_id', clientId);
+  };
+
+  const toggleWA = async () => {
+    const newValue = !clientData.whatsapp_enabled;
+    setClientData({...clientData, whatsapp_enabled: newValue});
+    await supabase.from('Clients').update({ whatsapp_enabled: newValue }).eq('client_id', clientId);
+  };
 
   const downloadCSV = () => {
     if (!leads.length) return;
@@ -159,21 +172,7 @@ const gradientText = {
 
   if (loading) {
     return (
-      <div
-        id="loading"
-        style={{
-          minHeight: '100vh',
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
-          gap: 14,
-          background: '#070915',
-          color: '#f4f6ff',
-          fontFamily: 'Inter, system-ui, -apple-system, Segoe UI, sans-serif'
-        }}
-      >
+      <div className="cp-loading">
         <style>{`
           @keyframes portalFaviconSpin {
             from { transform: rotate(0deg); }
@@ -184,341 +183,317 @@ const gradientText = {
           src="/favicon.svg?v=3"
           alt="Orvanto loading"
           style={{
-            width: 152,
-            height: 152,
-            animation: 'portalFaviconSpin 1s linear infinite',
-            filter: 'drop-shadow(0 0 16px rgba(168,85,247,.35))'
+            width: 120,
+            height: 120,
+            animation: 'portalFaviconSpin 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite',
+            filter: 'drop-shadow(0 0 20px rgba(168,85,247,.4))'
           }}
         />
-        <div style={{ fontSize: 25, color: '#c5d0e6' }}>Verifying access...</div>
+        <div style={{ fontSize: 20, color: '#94a3b8', fontWeight: 500, letterSpacing: 1 }}>VERIFYING PORTAL ACCESS</div>
       </div>
     );
   }
 
   if (errorMsg) {
     return (
-      <div id="loading" style={{ display: 'flex' }}>
-        <div style={{ textAlign: 'center', color: '#ef4444' }}>
-          <h2>Access Error</h2>
-          <p style={{ color: 'var(--muted)', marginTop: '8px' }}>{errorMsg}</p>
-          <p style={{ marginTop: '16px' }}><a href="/contact" style={{ color: 'var(--purple)' }}>Contact support →</a></p>
+      <div className="cp-root" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center', padding: 40, background: '#111118', borderRadius: 24, border: '1px solid #ef4444' }}>
+          <FontAwesomeIcon icon={faCircleXmark} style={{ fontSize: 60, color: '#ef4444', marginBottom: 20 }} />
+          <h2 style={{ fontSize: 28, color: '#f4f6ff', margin: 0 }}>Access Denied</h2>
+          <p style={{ color: '#94a3b8', marginTop: 12, fontSize: 16 }}>{errorMsg}</p>
+          <div style={{ marginTop: 24 }}>
+            <a href="/contact" style={{ color: '#a855f7', textDecoration: 'none', fontWeight: 600 }}>Contact support help →</a>
+          </div>
         </div>
       </div>
     );
   }
 
   const c = clientData;
-  const filteredLeads = leads.filter(l => (l.first_name + ' ' + l.last_name + ' ' + l.company + ' ' + l.email).toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 25);
+  const filteredLeads = leads.filter(l => 
+    (l.first_name + ' ' + l.last_name + ' ' + l.company + ' ' + l.email).toLowerCase().includes(searchQuery.toLowerCase())
+  ).slice(0, 50);
+
   const navItems = [
-    { label: 'How it works', href: '/#how-it-works' },
-    { label: 'Features', href: '/#features' },
-    { label: 'About', href: '/about' },
-    { label: 'Blog', href: '/blog/post-1' },
-    { label: 'Contact', href: '/contact' },
     { label: 'Active Leads', href: '#active-leads' },
-    { label: 'Upcoming Meetings', href: '#upcoming-meetings' }
+    { label: 'Meetings', href: '#meetings' },
+    { label: 'Reports', href: '/reports' },
+    { label: 'Contact', href: '/contact' }
   ];
-  const appBg = '#070915';
-  const panelBg = '#0c1020';
-  const panelBorder = '#1a2033';
-  const muted = '#93a0bb';
-  const subtle = '#68718b';
-  const text = '#f4f6ff';
-  const accent = '#8b5cf6';
-  const good = '#22c55e';
 
   return (
-    <>
-      <div style={{ minHeight: '100vh', background: appBg, color: text, fontFamily: 'Inter, system-ui, -apple-system, Segoe UI, sans-serif' }}>
-        <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000, padding: '16px 0', borderBottom: `1px solid ${panelBorder}`, backdropFilter: 'blur(20px)', background: 'rgba(10,10,15,.8)' }}>
-          <div style={{ maxWidth: 1500, margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <a href="/" style={{ fontSize: '1.4rem', fontWeight: 800, background: 'linear-gradient(135deg,#a855f7,#6366f1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', textDecoration: 'none',textAlign: 'center' }}>
-              Orvanto AI
+    <div className="cp-root">
+      {/* ─── PREMIUM NAVBAR ─── */}
+      <nav style={{ 
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000, 
+        padding: '20px 0', borderBottom: '1px solid #1e1e2e', 
+        backdropFilter: 'blur(25px)', background: 'rgba(10,10,15,.75)' 
+      }}>
+        <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <a href="/" style={{ 
+            fontSize: '1.5rem', fontWeight: 900, 
+            background: 'linear-gradient(135deg,#a855f7,#6366f1)', 
+            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', 
+            textDecoration: 'none', letterSpacing: -1
+          }}>
+            ORVANTO AI
+          </a>
+          
+          <div style={{ display: 'flex', gap: 32, alignItems: 'center' }}>
+            {!isMobileNav && navItems.map((item) => (
+              <a key={item.label} href={item.href} style={{ color: '#94a3b8', fontSize: '.9rem', fontWeight: 600, textDecoration: 'none', transition: 'color .2s' }} onMouseOver={e => e.target.style.color = '#fff'} onMouseOut={e => e.target.style.color = '#94a3b8'}>
+                {item.label}
+              </a>
+            ))}
+            <a href={`/dashboard?client=${clientId}`} style={{ 
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              background: 'linear-gradient(135deg,#a855f7,#6366f1)', 
+              color: '#fff', padding: '12px 24px', borderRadius: 12, 
+              fontWeight: 700, fontSize: '.9rem', textDecoration: 'none', 
+              boxShadow: '0 10px 25px rgba(168,85,247,.25)',
+              transition: 'transform .2s'
+            }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+              Full Dashboard <FontAwesomeIcon icon={faArrowUpRightFromSquare} style={{ fontSize: 12 }} />
             </a>
-            {!isMobileNav ? (
-              <div style={{ display: 'flex', gap: 26, alignItems: 'center', flexWrap: 'wrap' }}>
-                {navItems.map((item) => (
-                  <a key={item.label} href={item.href} style={{ color: muted, fontSize: '.9rem', fontWeight: 500, textDecoration: 'none' }}>
-                    {item.label}
-                  </a>
-                ))}
-                <a href={`/dashboard?client=${clientId}`} style={{ display: 'inline-block', background: 'linear-gradient(135deg,#a855f7,#6366f1)', color: '#fff', padding: '10px 24px', borderRadius: 10, fontWeight: 700, fontSize: '.9rem', textDecoration: 'none', boxShadow: '0 0 30px rgba(168,85,247,.3)' }}>
-                  Full Dashboard <FontAwesomeIcon icon={faArrowUpRightFromSquare} style={{ marginLeft: 6 }} />
-                </a>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setMobileMenuOpen((prev) => !prev)}
-                style={{
-                  background: 'transparent',
-                  border: `1px solid ${panelBorder}`,
-                  color: text,
-                  borderRadius: 8,
-                  padding: '8px 11px',
-                  fontSize: 18,
-                  cursor: 'pointer',
-                  lineHeight: 1
-                }}
-                aria-label="Toggle menu"
-              >
-                {mobileMenuOpen ? '✕' : '☰'}
-              </button>
-            )}
           </div>
-          {isMobileNav && mobileMenuOpen && (
-            <div style={{ maxWidth: 1500, margin: '10px auto 0', padding: '0 24px 10px' }}>
-              <div style={{ border: `1px solid ${panelBorder}`, borderRadius: 12, background: '#0c1020', padding: 12 }}>
-                {navItems.map((item) => (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    style={{ display: 'block', color: muted, fontSize: '.9rem', fontWeight: 500, textDecoration: 'none', padding: '10px 8px', borderRadius: 8 }}
-                  >
-                    {item.label}
-                  </a>
+        </div>
+      </nav>
+
+      {/* ─── HERO SECTION ─── */}
+      <section className="cp-hero" style={{ marginTop: 80 }}>
+        <div className="cp-hero-glow"></div>
+        <h1 className="cp-hero-heading" style={{ color: '#f4f6ff' }}>
+          {typedHeading}
+          <span style={{ color: '#a855f7', marginLeft: 4, animation: 'blink 1s infinite' }}>|</span>
+        </h1>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 12 }}>
+          <span style={{ padding: '4px 12px', borderRadius: 20, background: 'rgba(168,85,247,.1)', border: '1px solid rgba(168,85,247,.2)', color: '#a855f7', fontSize: '.75rem', fontWeight: 700, letterSpacing: 1 }}>
+            {(c.plan || 'starter').toUpperCase()} PLAN
+          </span>
+          <span style={{ padding: '4px 12px', borderRadius: 20, background: c.warmup_complete ? 'rgba(34,197,94,.1)' : 'rgba(245,158,11,.1)', border: c.warmup_complete ? '1px solid rgba(34,197,94,.2)' : '1px solid rgba(245,158,11,.2)', color: c.warmup_complete ? '#22c55e' : '#f59e0b', fontSize: '.75rem', fontWeight: 700, letterSpacing: 1 }}>
+            {c.warmup_complete ? 'OUTREACH LIVE' : `WARMING UP — DAY ${c.warmup_day || 0}/14`}
+          </span>
+        </div>
+      </section>
+
+      {/* ─── MAIN CONTENT ─── */}
+      <div className="cp-body" style={{ gridTemplateColumns: '1fr 340px' }}>
+        <div className="cp-center">
+          
+          {/* Stats Grid */}
+          <div className="cp-overview-row">
+            <div className="cp-card cp-pipeline-card" style={{ background: 'linear-gradient(135deg, #111118 0%, #0c0c14 100%)' }}>
+              <div className="cp-card-header">
+                <div className="cp-card-heading">
+                  <FontAwesomeIcon icon={faChartSimple} style={{ color: '#a855f7' }} /> Pipeline Performance
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, marginTop: 16 }}>
+                {[
+                  { label: 'Leads Found', val: c.leads_generated || 0, color: '#f4f6ff' },
+                  { label: 'Outreach Sent', val: c.emails_sent || 0, color: '#a855f7' },
+                  { label: 'Positive Replies', val: c.replies_received || 0, color: '#f59e0b' },
+                  { label: 'Meetings', val: c.meetings_booked || 0, color: '#22c55e' },
+                  { label: 'Pipeline Value', val: `$${Math.round(c.pipeline_value || 0).toLocaleString()}`, color: '#a855f7' },
+                  { label: 'Conv. Rate', val: `${((c.meetings_booked || 0) / (Math.max(c.emails_sent, 1)) * 100).toFixed(1)}%`, color: '#f4f6ff' }
+                ].map(stat => (
+                  <div key={stat.label} className="cp-pipeline-item">
+                    <div className="cp-pipeline-label">{stat.label}</div>
+                    <div className="cp-pipeline-value" style={{ color: stat.color }}>{stat.val}</div>
+                  </div>
                 ))}
-                <a
-                  href={`/dashboard?client=${clientId}`}
-                  onClick={() => setMobileMenuOpen(false)}
-                  style={{ display: 'block', marginTop: 10, textAlign: 'center', background: 'linear-gradient(135deg,#a855f7,#6366f1)', color: '#fff', padding: '10px 14px', borderRadius: 10, fontWeight: 700, fontSize: '.9rem', textDecoration: 'none', boxShadow: '0 0 30px rgba(168,85,247,.3)' }}
-                >
-                  Full Dashboard <FontAwesomeIcon icon={faArrowUpRightFromSquare} style={{ marginLeft: 6 }} />
-                </a>
               </div>
             </div>
-          )}
-        </nav>
 
-        <div style={{ maxWidth: 1500, margin: '0 auto', padding: '8px 24px 24px' }}>
-          <main>
-            <div>
-              <section>
-                <div style={{ marginBottom: 14, textAlign: 'center' }}>
-                <h1 style={{ margin: 0, fontSize: 45, fontWeight: 700 }}>
-                  {typedHeading}
-                  <span style={{ color: accent, marginLeft: 3 }}>|</span>
-                </h1>
-                  <div style={{ color: muted, fontSize: 13, marginTop: 7 }}>
-                    {(c.plan || 'starter').toUpperCase()} PLAN · {c.warmup_complete ? 'OUTREACH LIVE' : `WARMING UP — DAY ${c.warmup_day || 0}/14`}
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr .95fr .75fr', gap: 16, marginBottom: 16 }}>
-                  <div style={{ border: `1px solid ${panelBorder}`, borderRadius: 16, background: panelBg, padding: 16 }}>
-                    <div style={{ fontWeight: 700, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10, fontSize: 30 }}>
-                      <FontAwesomeIcon icon={faChartSimple} style={{ color: accent, fontSize: 30 }} /> Pipeline Overview
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', rowGap: 14 }}>
-                      <div><div style={{ color: subtle, fontSize: 11, textTransform: 'uppercase' }}>Leads Generated</div><div style={{ fontSize: 34, fontWeight: 700 }}>{c.leads_generated || 0}</div></div>
-                      <div><div style={{ color: subtle, fontSize: 11, textTransform: 'uppercase' }}>Emails Sent</div><div style={{ fontSize: 34, fontWeight: 700, color: accent }}>{c.emails_sent || 0}</div></div>
-                      <div><div style={{ color: subtle, fontSize: 11, textTransform: 'uppercase' }}>Replies</div><div style={{ fontSize: 34, fontWeight: 700 }}>{c.replies_received || 0}</div></div>
-                      <div><div style={{ color: subtle, fontSize: 11, textTransform: 'uppercase' }}>Meetings Booked</div><div style={{ fontSize: 34, fontWeight: 700, color: good }}>{c.meetings_booked || 0}</div></div>
-                      <div><div style={{ color: subtle, fontSize: 11, textTransform: 'uppercase' }}>Pipeline Value</div><div style={{ fontSize: 34, fontWeight: 700, color: accent }}>${Math.round(c.pipeline_value || 0).toLocaleString()}</div></div>
-                    </div>
-                  </div>
-                  <div style={{ border: `1px solid ${panelBorder}`, borderRadius: 16, background: panelBg, padding: 16 }}>
-                    <div style={{ fontWeight: 700, marginBottom: 14, display: 'flex', alignItems: 'center', gap: 10,fontSize: 27}}>
-                      <FontAwesomeIcon icon={faGear} style={{ fontSize: 22 }} /> Controls
-                    </div>
-                    {[
-                      { label: 'Outreach Active', sub: 'Pause to stop all emails and calls', enabled: c.status !== 'paused', onClick: toggleOutreach },
-                      { label: 'SMS Enabled', sub: 'Twilio SMS outreach', enabled: !!c.sms_enabled, onClick: toggleSMS },
-                      { label: 'WhatsApp Enabled', sub: '360dialog WhatsApp', enabled: !!c.whatsapp_enabled, onClick: toggleWA }
-                    ].map((item) => (
-                      <div key={item.label} style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
-                        <button
-                          type="button"
-                          onClick={item.onClick}
-                          style={{
-                            width: 34,
-                            height: 20,
-                            marginTop: 2,
-                            borderRadius: 999,
-                            border: `1px solid ${item.enabled ? '#16a34a' : '#525c73'}`,
-                            background: item.enabled ? '#14b85f' : '#394359',
-                            cursor: 'pointer',
-                            position: 'relative'
-                          }}
-                        >
-                          <span
-                            style={{
-                              position: 'absolute',
-                              top: 1.5,
-                              left: item.enabled ? 16 : 2,
-                              width: 14,
-                              height: 14,
-                              borderRadius: '50%',
-                              background: '#fff',
-                              transition: 'all .2s'
-                            }}
-                          />
-                        </button>
-                        <div>
-                          <div style={{ fontWeight: 600, fontSize: 14 }}>{item.label}</div>
-                          <div style={{ color: muted, fontSize: 12 }}>{item.sub}</div>
-                        </div>
+            <div className="cp-card cp-controls-card">
+              <div className="cp-card-header">
+                <div className="cp-card-heading"><FontAwesomeIcon icon={faGear} /> System Controls</div>
+              </div>
+              <div className="cp-ctrl-list" style={{ marginTop: 10 }}>
+                {[
+                  { label: 'Outreach Status', sub: c.status === 'paused' ? 'Currently Paused' : 'Running', on: c.status !== 'paused', toggle: toggleOutreach },
+                  { label: 'SMS Integration', sub: 'Twilio Cloud', on: !!c.sms_enabled, toggle: toggleSMS },
+                  { label: 'WhatsApp', sub: '360Dialog API', on: !!c.whatsapp_enabled, toggle: toggleWA }
+                ].map(ctrl => (
+                  <div key={ctrl.label} className="cp-ctrl-row">
+                    <div className="cp-ctrl-info">
+                      <div className="cp-ctrl-dot" style={{ background: ctrl.on ? '#22c55e' : '#64748b' }}></div>
+                      <div>
+                        <div className="cp-ctrl-label">{ctrl.label}</div>
+                        <div className="cp-ctrl-desc">{ctrl.sub}</div>
                       </div>
-                    ))}
-                    <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
-                      <a
-                        href="#"
-                        onClick={(e) => { e.preventDefault(); downloadCSV(); }}
-                        style={{ border: `1px solid ${panelBorder}`, color: text, textDecoration: 'none', fontSize: 12, padding: '9px 10px', borderRadius: 10, display: 'inline-flex', alignItems: 'center', gap: 8 }}
-                      >
-                        <FontAwesomeIcon icon={faDownload} style={{ fontSize: 22 }} /> Download Leads CSV
-                      </a>
                     </div>
+                    <button className={`cp-toggle ${ctrl.on ? 'on' : ''}`} onClick={ctrl.toggle}>
+                      <div className="cp-toggle-knob"></div>
+                    </button>
                   </div>
-                  <div style={{ border: `1px solid ${panelBorder}`, borderRadius: 16, background: panelBg, padding: 16, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <div>
-                      <div style={{ fontWeight: 700, marginBottom: 4, fontSize: 30 }}>Need Help?</div>
-                      <p style={{ 
-                        color: muted, 
-                        fontSize: 15, 
-                        lineHeight: 1.6,
-                        margin: '0 0 14px',
-                        maxWidth: 280
-                      }}>
-                        Have a question or issue? Our team responds fast.
-                      </p>
-                    </div>
-                    <a href="/contact" style={{ color: accent, textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>
-                      Contact Support <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
-                    </a>
-                  </div>
-                </div>
-
-                <div id="active-leads" style={{ border: `1px solid ${panelBorder}`, borderRadius: 16, background: panelBg, padding: 16 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                    <h2 style={{ fontWeight: 700, marginBottom: 8, fontSize: 30, marginTop: 2 }}>Active Leads</h2>
-                    <div style={{ width: 250, position: 'relative' }}>
-                      <FontAwesomeIcon icon={faMagnifyingGlass} style={{ position: 'absolute', left: 12, top: 10, color: subtle, fontSize: 12 }} />
-                      <input
-                        type="text"
-                        placeholder="Search..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        style={{ width: '100%', background: '#0a0f1d', border: `1px solid ${panelBorder}`, borderRadius: 10, color: text, padding: '8px 10px 8px 32px', fontSize: 13, outline: 'none' }}
-                      />
-                    </div>
-                  </div>
-                  <div style={{ overflowX: 'auto', overflowY: 'auto', maxHeight: 340 }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-                      <thead>
-                        <tr style={{ color: subtle, fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                          <th style={{ textAlign: 'left', padding: '8px 6px' }}>Name</th>
-                          <th style={{ textAlign: 'left', padding: '8px 6px' }}>Company</th>
-                          <th style={{ textAlign: 'left', padding: '8px 6px' }}>Status</th>
-                          <th style={{ textAlign: 'left', padding: '8px 6px' }}>Channel</th>
-                          <th style={{ textAlign: 'left', padding: '8px 6px' }}>BANT</th>
-                          <th style={{ textAlign: 'left', padding: '8px 6px' }}>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredLeads.length === 0 ? (
-                          <tr><td colSpan="6" style={{ color: muted, padding: 24 }}>No leads found.</td></tr>
-                        ) : (
-                          filteredLeads.map((l, i) => {
-                            const status = l.meeting_booked ? 'booked' : l.email_replied ? 'replied' : l.email_sent ? 'emailed' : 'new';
-                            const channels = [l.email_sent && 'Email', l.sms_sent && 'SMS', l.whatsapp_sent && 'WA', l.voice_called && 'Voice', l.linkedin_sent && 'LI'].filter(Boolean).join(' · ') || '—';
-                            return (
-                              <tr key={i} style={{ borderTop: `1px solid ${panelBorder}` }}>
-                                <td style={{ padding: '10px 6px' }}><div style={{ fontWeight: 600 }}>{l.first_name || ''} {l.last_name || ''}</div><div style={{ color: subtle, fontSize: 11 }}>{l.email || ''}</div></td>
-                                <td style={{ padding: '10px 6px' }}><div>{l.company || '—'}</div><div style={{ color: subtle, fontSize: 11 }}>{l.title || ''}</div></td>
-                                <td style={{ padding: '10px 6px' }}>
-                                  <span style={{ fontSize: 11, textTransform: 'lowercase', borderRadius: 999, padding: '3px 10px', border: `1px solid ${status === 'booked' ? '#245f3a' : status === 'replied' ? '#6d5d2a' : status === 'emailed' ? '#473a77' : '#38425a'}`, color: status === 'booked' ? '#63f29f' : status === 'replied' ? '#facc15' : status === 'emailed' ? '#bf9cff' : '#9aa5bf' }}>
-                                    {status}
-                                  </span>
-                                </td>
-                                <td style={{ padding: '10px 6px', color: muted, fontSize: 12 }}>{channels}</td>
-                                <td style={{ padding: '10px 6px', color: (l.bant_score || 0) >= 70 ? good : muted }}>{l.bant_score || '—'}</td>
-                                <td style={{ padding: '10px 6px' }}><a href={`mailto:${l.email}`} style={{ color: accent, fontSize: 12, textDecoration: 'none' }}>Email</a></td>
-                              </tr>
-                            );
-                          })
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                <div style={{ border: `1px solid ${panelBorder}`, borderRadius: 16, background: panelBg, padding: 14,marginTop: 14 }}>
-                  <div style={{ fontWeight: 700, marginBottom: 8, fontSize: 30, marginTop: 2 }}>Upcoming Meetings</div>
-                  {meetings.length === 0 ? (
-                    <p style={{ color: muted, fontSize: 12, lineHeight: 1.5, margin: 0 }}>No meetings yet. Meetings appear here when prospects book via your Cal.com link.</p>
-                  ) : (
-                    meetings.map((m, i) => (
-                      <div key={i} style={{ border: `1px solid ${panelBorder}`, borderRadius: 10, padding: 10, marginBottom: 8 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
-                          <strong style={{ color: '#e9edfb' }}>Meeting {m.id}</strong>
-                          <span style={{ color: muted }}>{m.meeting_at ? new Date(m.meeting_at).toLocaleDateString() : '—'}</span>
-                        </div>
-                        <div style={{ color: muted, fontSize: 12, marginTop: 4 }}>{m.outcome || 'Scheduled'} · ${m.deal_value || 0}</div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </section>
-
-              {/* <section id="upcoming-meetings" style={{ display: 'grid', gap: 0, alignContent: 'start', marginTop: 0 }}>
-                <div style={{ border: `1px solid ${panelBorder}`, borderRadius: 16, background: panelBg, padding: 14 }}>
-                  <div style={{ fontWeight: 700, marginBottom: 8, fontSize: 18 }}>Upcoming Meetings</div>
-                  {meetings.length === 0 ? (
-                    <p style={{ color: muted, fontSize: 12, lineHeight: 1.5, margin: 0 }}>No meetings yet. Meetings appear here when prospects book via your Cal.com link.</p>
-                  ) : (
-                    meetings.map((m, i) => (
-                      <div key={i} style={{ border: `1px solid ${panelBorder}`, borderRadius: 10, padding: 10, marginBottom: 8 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
-                          <strong style={{ color: '#e9edfb' }}>Meeting {m.id}</strong>
-                          <span style={{ color: muted }}>{m.meeting_at ? new Date(m.meeting_at).toLocaleDateString() : '—'}</span>
-                        </div>
-                        <div style={{ color: muted, fontSize: 12, marginTop: 4 }}>{m.outcome || 'Scheduled'} · ${m.deal_value || 0}</div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </section> */}
+                ))}
+              </div>
+              <div className="cp-ctrl-actions">
+                <button onClick={downloadCSV} className="cp-btn-outline" style={{ width: '100%' }}>
+                  <FontAwesomeIcon icon={faDownload} /> Export Leads Database
+                </button>
+              </div>
             </div>
-          </main>
+          </div>
+
+          {/* Active Leads Table */}
+          <div className="cp-card" id="active-leads">
+            <div className="cp-card-header">
+              <div className="cp-card-heading">Active Lead Pipeline</div>
+              <div className="cp-table-search">
+                <FontAwesomeIcon icon={faMagnifyingGlass} />
+                <input type="text" placeholder="Search leads..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+              </div>
+            </div>
+            <div className="cp-table-wrap">
+              <table className="cp-table">
+                <thead>
+                  <tr>
+                    <th>Lead Details</th>
+                    <th>Company / Title</th>
+                    <th>Status</th>
+                    <th>Engagement</th>
+                    <th>BANT</th>
+                    <th>Quick Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredLeads.length === 0 ? (
+                    <tr><td colSpan="6" className="cp-empty">No matching leads found in your pipeline.</td></tr>
+                  ) : (
+                    filteredLeads.map((l, i) => {
+                      const status = l.meeting_booked ? 'booked' : l.email_replied ? 'replied' : l.email_sent ? 'emailed' : 'new';
+                      const channels = [
+                        l.email_sent && <FontAwesomeIcon icon={faEnvelope} title="Email" />,
+                        l.sms_sent && <FontAwesomeIcon icon={faMessage} title="SMS" />,
+                        l.voice_called && <FontAwesomeIcon icon={faPhone} title="Voice" />,
+                        l.linkedin_sent && <FiLinkedin title="LinkedIn" />
+                      ].filter(Boolean);
+                      
+                      return (
+                        <tr key={i}>
+                          <td>
+                            <div className="cp-lead-name">{l.first_name} {l.last_name}</div>
+                            <div className="cp-lead-email">{l.email}</div>
+                          </td>
+                          <td>
+                            <div className="cp-lead-company">{l.company || '—'}</div>
+                            <div className="cp-lead-title">{l.title || ''}</div>
+                          </td>
+                          <td>
+                            <span className={`cp-badge cp-badge-${status}`}>{status}</span>
+                          </td>
+                          <td>
+                            <div style={{ display: 'flex', gap: 10, color: '#64748b' }}>
+                              {channels.length > 0 ? channels.map((ic, ii) => <span key={ii}>{ic}</span>) : '—'}
+                            </div>
+                          </td>
+                          <td>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <div style={{ flex: 1, height: 4, background: '#1e1e2e', borderRadius: 2, minWidth: 40 }}>
+                                <div style={{ height: '100%', borderRadius: 2, width: `${l.bant_score || 0}%`, background: (l.bant_score || 0) >= 70 ? '#22c55e' : (l.bant_score || 0) >= 40 ? '#f59e0b' : '#64748b' }}></div>
+                              </div>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: (l.bant_score || 0) >= 70 ? '#22c55e' : '#94a3b8' }}>{l.bant_score || 0}</span>
+                            </div>
+                          </td>
+                          <td>
+                            <div style={{ display: 'flex', gap: 12 }}>
+                              <a href={`mailto:${l.email}`} className="cp-action-link"><FontAwesomeIcon icon={faEnvelope} /></a>
+                              {l.linkedin_url && <a href={l.linkedin_url} target="_blank" rel="noreferrer" className="cp-action-link"><FiLinkedin /></a>}
+                              <a href="#" className="cp-action-link"><FiExternalLink /></a>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
 
-        <footer style={{ background: '#0a0a0f', borderTop: `1px solid ${panelBorder}`, padding: '60px 24px' }}>
-          <div style={{ maxWidth: 1500, margin: '0 auto' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 42 }}>
+        {/* ─── RIGHT SIDEBAR ─── */}
+        <div className="cp-right">
+          
+          {/* Meeting Guarantee */}
+          <div className="cp-card cp-guarantee-card">
+            <div className="cp-guarantee-header">
+              <FontAwesomeIcon icon={faShieldHalved} className="cp-guarantee-icon" style={{ fontSize: 24 }} />
               <div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, background: 'linear-gradient(135deg,#a855f7,#6366f1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: 16 }}>Orvanto AI</div>
-                <p style={{ color: muted, fontSize: '.85rem', lineHeight: 1.7, maxWidth: 360 }}>
-                  The world's most complete done-for-you B2B sales infrastructure. Find leads, send outreach, book meetings on autopilot.
-                </p>
-              </div>
-              <div>
-                <h4 style={{ fontWeight: 700, marginBottom: 14, fontSize: '.9rem' }}>Portal</h4>
-                <a href={`/dashboard?client=${clientId}`} style={{ display: 'block', color: muted, fontSize: '.85rem', marginBottom: 10, textDecoration: 'none' }}>Dashboard</a>
-                <a href="#active-leads" style={{ display: 'block', color: muted, fontSize: '.85rem', marginBottom: 10, textDecoration: 'none' }}>Active Leads</a>
-                <a href="#upcoming-meetings" style={{ display: 'block', color: muted, fontSize: '.85rem', marginBottom: 10, textDecoration: 'none' }}>Upcoming Meetings</a>
-              </div>
-              <div>
-                <h4 style={{ fontWeight: 700, marginBottom: 14, fontSize: '.9rem' }}>Company</h4>
-                <a href="/" style={{ display: 'block', color: muted, fontSize: '.85rem', marginBottom: 10, textDecoration: 'none' }}>Home</a>
-                <a href="/about" style={{ display: 'block', color: muted, fontSize: '.85rem', marginBottom: 10, textDecoration: 'none' }}>About</a>
-                <a href="/blog/post-1" style={{ display: 'block', color: muted, fontSize: '.85rem', marginBottom: 10, textDecoration: 'none' }}>Blogs</a>
-                <a href="/contact" style={{ display: 'block', color: muted, fontSize: '.85rem', marginBottom: 10, textDecoration: 'none' }}>Contact</a>
-              </div>
-              <div>
-                <h4 style={{ fontWeight: 700, marginBottom: 14, fontSize: '.9rem' }}>Legal</h4>
-                <a href="/policy" style={{ display: 'block', color: muted, fontSize: '.85rem', marginBottom: 10, textDecoration: 'none' }}>Privacy Policy</a>
-                <a href="/terms-of-service" style={{ display: 'block', color: muted, fontSize: '.85rem', marginBottom: 10, textDecoration: 'none' }}>Terms of Service</a>
+                <div className="cp-guarantee-title">Meeting Guarantee</div>
+                <div className="cp-guarantee-sub">3 meetings in 30 days</div>
               </div>
             </div>
-            <div style={{ borderTop: `1px solid ${panelBorder}`, marginTop: 40, paddingTop: 18, display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-              <p style={{ color: subtle, fontSize: '.8rem', margin: 0 }}>© 2025 Orvanto AI / Sanfy Consultancy Services Pvt. Ltd. All rights reserved.</p>
-              <p style={{ color: subtle, fontSize: '.8rem', margin: 0 }}>support@orvantoai.com</p>
+            <div className="cp-guarantee-bar">
+              <div className="cp-guarantee-fill" style={{ width: `${Math.min((c.meetings_booked || 0) / 3 * 100, 100)}%` }}></div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: '.7rem', fontWeight: 600 }}>
+              <span style={{ color: '#22c55e' }}>{c.meetings_booked || 0} SECURED</span>
+              <span style={{ color: '#94a3b8' }}>GOAL: 3</span>
             </div>
           </div>
-        </footer>
+
+          {/* Upcoming Meetings */}
+          <div className="cp-card" id="meetings">
+            <div className="cp-card-header">
+              <div className="cp-card-heading"><FontAwesomeIcon icon={faCalendarCheck} style={{ color: '#22c55e' }} /> Upcoming Meetings</div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 10 }}>
+              {meetings.length === 0 ? (
+                <div className="cp-empty">No meetings booked yet.</div>
+              ) : (
+                meetings.map((m, i) => (
+                  <div key={i} className="cp-doc-row" style={{ background: 'rgba(255,255,255,0.02)', padding: 12, borderRadius: 12 }}>
+                    <div className="cp-doc-icon"><FontAwesomeIcon icon={faCalendarCheck} /></div>
+                    <div style={{ flex: 1 }}>
+                      <div className="cp-doc-name">{m.contact_name || `Prospect ${m.id.toString().slice(-4)}`}</div>
+                      <div className="cp-doc-meta">
+                        {m.meeting_at ? new Date(m.meeting_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Pending Time'}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+            <div style={{ marginTop: 16 }}>
+              <button className="cp-btn-primary" style={{ width: '100%' }}>Sync Calendar</button>
+            </div>
+          </div>
+
+          {/* Support Widget */}
+          <div className="cp-card" style={{ background: 'linear-gradient(135deg, #a855f710, #6366f110)', border: '1px solid #a855f730' }}>
+            <h3 style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>Need Priority Help?</h3>
+            <p style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.5, marginBottom: 16 }}>
+              Your account manager is available 24/7 for strategy adjustments and technical support.
+            </p>
+            <a href="/contact" className="cp-btn-primary" style={{ width: '100%', textDecoration: 'none' }}>
+              Message Support
+            </a>
+          </div>
+
+        </div>
       </div>
-    </>
+
+      <footer className="cp-footer">
+        <div style={{ maxWidth: 1400, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <p>© 2025 Orvanto AI. Sanfy Consultancy Services Pvt. Ltd.</p>
+          <div style={{ display: 'flex', gap: 20 }}>
+            <a href="/policy">Privacy</a>
+            <a href="/terms-of-service">Terms</a>
+            <a href="/contact">Support</a>
+          </div>
+        </div>
+      </footer>
+
+      <style>{`
+        @keyframes blink { 50% { opacity: 0; } }
+        .cp-action-link { transition: transform 0.2s; display: inline-block; }
+        .cp-action-link:hover { transform: scale(1.2); color: #fff; }
+        .cp-table-wrap::-webkit-scrollbar { height: 6px; }
+        .cp-table-wrap::-webkit-scrollbar-thumb { background: #1e1e2e; border-radius: 10px; }
+      `}</style>
+    </div>
   );
 }

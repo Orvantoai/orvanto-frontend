@@ -7,25 +7,33 @@ export default function Policy() {
 
   // Sidebar sections — same grouped h3 + a pattern as TermsOfService / ApiDocs
   const sections = [
-    { group: "Overview", items: [
-      { id: "welcome",                      label: "Introduction"     },
-      { id: "1-who-we-are",                 label: "Who We Are"       },
-    ]},
-    { group: "Data Handling", items: [
-      { id: "2-data-we-collect",            label: "Data We Collect"  },
-      { id: "3-how-we-use-your-data",       label: "How We Use Data"  },
-      { id: "4-compliance-gdpr--can-spam",   label: "Compliance"       },
-      { id: "5-data-sharing",               label: "Data Sharing"     },
-      { id: "6-data-retention",             label: "Data Retention"   },
-    ]},
-    { group: "Your Rights & Security", items: [
-      { id: "7-your-rights",               label: "Your Rights"      },
-      { id: "8-security",                  label: "Security"         },
-      { id: "9-cookies",                   label: "Cookies"          },
-    ]},
-    { group: "Support", items: [
-      { id: "10-contact",                  label: "Contact"          },
-    ]},
+    {
+      group: "Overview", items: [
+        { id: "welcome", label: "Introduction" },
+        { id: "1-who-we-are", label: "Who We Are" },
+      ]
+    },
+    {
+      group: "Data Handling", items: [
+        { id: "2-data-we-collect", label: "Data We Collect" },
+        { id: "3-how-we-use-your-data", label: "How We Use Data" },
+        { id: "4-compliance-gdpr--can-spam", label: "Compliance" },
+        { id: "5-data-sharing", label: "Data Sharing" },
+        { id: "6-data-retention", label: "Data Retention" },
+      ]
+    },
+    {
+      group: "Your Rights & Security", items: [
+        { id: "7-your-rights", label: "Your Rights" },
+        { id: "8-security", label: "Security" },
+        { id: "9-cookies", label: "Cookies" },
+      ]
+    },
+    {
+      group: "Support", items: [
+        { id: "10-contact", label: "Contact" },
+      ]
+    },
   ];
 
   const allItems = sections.flatMap(s => s.items);
@@ -139,7 +147,8 @@ export default function Policy() {
         </aside>
 
         {/* ── MAIN CONTENT ── */}
-    <main className="api-content policy-content" dangerouslySetInnerHTML={{ __html: `
+        <main className="api-content policy-content" dangerouslySetInnerHTML={{
+          __html: `
   <h1 id="welcome">Privacy <span style="background:linear-gradient(90deg,#ff95b4,#a855f7);-webkit-background-clip:text;background-clip:text;color:transparent">Policy</span></h1>
   <span class="version-badge">April 2025 — Sanfy Consultancy Services Pvt. Ltd.</span>
 
@@ -232,7 +241,31 @@ export default function Policy() {
           list-style:circle;
           margin:24px 5px;
           padding-left:35px;}
+/* Desktop Layout Fix */
+.layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px; /* or 20px if you want spacing */
+}
 
+/* Sidebar fixed width */
+.api-sidebar {
+  width: 260px;
+  min-width: 260px;
+  position: sticky;
+  top: 104px; /* matches navbar offset */
+  height: calc(100vh - 104px);
+  overflow-y: auto;
+}
+
+/* Main content should take remaining space */
+.api-content {
+  flex: 1;
+  max-width: 100%;
+}
+  .api-content {
+  padding-left: 40px;
+}
         @media (max-width: 900px) {
           .policy-page.layout {
             display: block;

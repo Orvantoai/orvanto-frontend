@@ -33,6 +33,8 @@ import Pipeline from './pages/Pipeline';
 import Warmup from './pages/Warmup';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
+import Settings from './pages/Settings';
+import Help from './pages/Help';
 
 function App() {
   return (
@@ -45,7 +47,7 @@ function App() {
 function AppLayout() {
   const location = useLocation();
   // Hide the global site navbar on the portal and internal dashboard routes
-  const hidePaths = ['/portal', '/dashboard', '/leads', '/meetings', '/outreach', '/pipeline', '/pipelines', '/reports', '/warmup', '/admin', '/login'];
+  const hidePaths = ['/portal', '/dashboard', '/leads', '/meetings', '/outreach', '/pipeline', '/pipelines', '/reports', '/warmup', '/admin', '/login', '/settings', '/help'];
   const hideGlobalNavbar = hidePaths.some(p => location.pathname.startsWith(p));
 
   return (
@@ -77,6 +79,8 @@ function AppLayout() {
         <Route path="/pipeline" element={<ProtectedRoute><Pipeline /></ProtectedRoute>} />
         <Route path="/pipelines" element={<ProtectedRoute><Pipeline /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+        <Route path="/help" element={<ProtectedRoute><Help /></ProtectedRoute>} />
         
         {/* Public Portal/Docs */}
         <Route path="/portal" element={<Portal />} />
