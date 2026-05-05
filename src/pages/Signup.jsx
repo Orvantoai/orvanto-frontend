@@ -22,6 +22,7 @@ export default function Signup() {
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [successClientId, setSuccessClientId] = useState('');
   const [errors, setErrors] = useState({});
 
   // Payment & Coupon State
@@ -410,10 +411,11 @@ export default function Signup() {
       // 4. Trigger n8n webhook
       await submitOnboarding({ ...formData, client_id: clientId });
 
+      setSuccessClientId(clientId);
       setIsSuccess(true);
       setIsSubmitting(false);
 
-      // Auto-redirect to dashboard after a delay
+      // Auto-redirect to dashboard after 3 seconds
       setTimeout(() => {
         navigate(`/dashboard?client=${clientId}`);
       }, 3000);
@@ -848,11 +850,12 @@ export default function Signup() {
                   /* SUCCESS SCREEN */
                   <div className="contact-success animate-in fade-in duration-500">
                     <span className="contact-success-icon"></span>
-                    <h2 className="text-2xl font-bold mb-4">Pipeline initiated</h2>
+                    <h2 className="text-2xl font-bold mb-4">🎉 Pipeline initiated!</h2>
                     <p className="text-muted leading-relaxed mb-8">
-                      Check your inbox. We've sent your dashboard link and the DNS setup instructions to <strong>{formData.work_email}</strong>.
+                      Welcome aboard! Your account is set up for <strong>{formData.work_email}</strong>.<br/>
+                      Redirecting you to your dashboard in 3 seconds...
                     </p>
-                    <div className="flex flex-col gap-3 text-left max-w-sm mx-auto">
+                    <div className="flex flex-col gap-3 text-left max-w-sm mx-auto mb-8">
                       <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-sm">
                         <span className="text-muted mr-2">Step 1:</span> Welcome & Roadmap
                       </div>
@@ -860,10 +863,15 @@ export default function Signup() {
                         <span className="text-muted mr-2">Step 2:</span> Live Dashboard Access
                       </div>
                       <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-sm">
-                        <span className="text-muted mr-2">Step 3:</span> 5-Min DNS Connection
+                        <span className="text-muted mr-2">Step 3:</span> AI Outreach Begins
                       </div>
                     </div>
-                    <Link to="/" className="btn-submit-new inline-block mt-8">Return to Home</Link>
+                    <button
+                      className="btn-submit-new inline-block mt-2"
+                      onClick={() => navigate(`/dashboard?client=${successClientId}`)}
+                    >
+                      Go to Dashboard →
+                    </button>
                   </div>
                 )}
               </div>
