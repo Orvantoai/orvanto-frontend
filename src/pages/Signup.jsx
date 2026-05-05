@@ -408,8 +408,22 @@ export default function Signup() {
         });
       }
 
-      // 4. Trigger n8n webhook
+      // 4. Trigger n8n WF-01 onboarding webhook
       await submitOnboarding({ ...formData, client_id: clientId });
+
+      // 5. Send welcome email with client_id and initial password via WF-16
+      fetch('https://primary-production-809296.up.railway.app/webhook/wf16-welcome-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          client_id: clientId,
+          email: formData.work_email,
+          name: formData.contact_name,
+          company: formData.company_name,
+          plan: formData.plan,
+          password: formData.password
+        })
+      }).catch(() => {}); // Non-blocking — don't fail signup if email fails
 
       setSuccessClientId(clientId);
       setIsSuccess(true);
