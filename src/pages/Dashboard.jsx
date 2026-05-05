@@ -420,9 +420,9 @@ export default function Dashboard() {
 
           <div className="flex flex-col lg:flex-row gap-8">
               {/* Outreach Performance Chart */}
-              <div className="flex-[2] leads-over-time-card">
-                <div className="card-heading">Outreach Performance</div>
-                <div style={{ position: 'absolute', top: 24, right: 24 }}>
+              <div className="flex-[2] bg-white/[0.03] border border-white/10 rounded-[32px] p-8 backdrop-blur-xl relative flex flex-col min-h-[450px]">
+                <h3 className="text-xl font-bold mb-2 flex items-center gap-2 text-white">Outreach Performance</h3>
+                <div style={{ position: 'absolute', top: 32, right: 32 }}>
                   <button className="btn-small">Last 30 Days ▼</button>
                 </div>
                 <div style={{ padding: 12, position: 'relative' }}>
@@ -461,9 +461,9 @@ export default function Dashboard() {
               </div>
 
               {/* Funnel Section */}
-              <div className="flex-1 outreach-breakdown-card">
-                <div className="card-heading">Funnel Overview</div>
-                <div className="funnel-overview" style={{ padding: 12 }}>
+              <div className="flex-1 bg-white/[0.03] border border-white/10 rounded-[32px] p-8 backdrop-blur-xl relative flex flex-col min-h-[450px]">
+                <h3 className="text-xl font-bold mb-2 flex items-center gap-2 text-white">Funnel Overview</h3>
+                <div className="funnel-overview" style={{ padding: 12, flex: 1, display: 'flex', alignItems: 'center' }}>
                   <div className="funnel-svg" style={{ width: 160, position: 'relative', zIndex: 2, marginRight: -28 }}>
                     <svg width="160" height="100%" viewBox={`0 0 160 ${funnelViewBoxHeight}`} role="img" aria-label="Funnel Overview">
                       <defs>
@@ -533,9 +533,9 @@ export default function Dashboard() {
               </div>
 
               {/* Account Health Section */}
-              <div className="flex-1 outreach-breakdown-card">
-                <div className="card-heading">Account Health</div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 12 }}>
+              <div className="flex-1 bg-white/[0.03] border border-white/10 rounded-[32px] p-8 backdrop-blur-xl relative flex flex-col min-h-[450px]">
+                <h3 className="text-xl font-bold mb-2 flex items-center gap-2 text-white">Account Health</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 12, flex: 1, justifyContent: 'center' }}>
                   <div style={{ width: 120, height: 120, display:'flex', alignItems:'center', justifyContent:'center' }}>
                     <svg width="120" height="120" viewBox="0 0 120 120">
                       <defs>
