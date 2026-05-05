@@ -410,42 +410,15 @@ export default function Dashboard() {
                         <div className="text-xs text-gray-500">{m.time}</div>
                       </div>
                     </div>
-                  )) : (
-                    <div className="text-center py-8 text-gray-500 font-medium">No meetings scheduled this week.</div>
                   )}
-                </div>
-              </div>
-
-              {/* Health Tracker */}
-              <div className="bg-gradient-to-br from-purple-600/20 to-indigo-600/20 border border-white/10 rounded-[32px] p-8 backdrop-blur-xl relative overflow-hidden">
-                <div className="relative z-10">
-                  <h3 className="text-xl font-bold mb-2 flex items-center gap-2 text-white">
-                    <FiShield className="text-blue-400" /> Account Health
-                  </h3>
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="text-5xl font-black text-white">98%</div>
-                    <div className="text-sm font-bold text-blue-400 uppercase tracking-widest">Optimal Performance</div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center text-xs font-bold text-white/60">
-                      <span>Email Deliverability</span>
-                      <span className="text-green-400">EXCELLENT</span>
-                    </div>
-                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                      <div className="h-full bg-green-400 w-[96%]" />
-                    </div>
-                  </div>
-                </div>
-                <div className="absolute top-0 right-0 p-8 opacity-10">
-                  <FiTrendingUp className="text-[120px]" />
                 </div>
               </div>
             </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div className="charts-row" style={{ alignItems: 'stretch' }}>
+
+          <div className="flex flex-col lg:flex-row gap-8">
               {/* Outreach Performance Chart */}
-              <div style={{ flex: 2 }} className="leads-over-time-card">
+              <div className="flex-[2] leads-over-time-card">
                 <div className="card-heading">Outreach Performance</div>
                 <div style={{ position: 'absolute', top: 24, right: 24 }}>
                   <button className="btn-small">Last 30 Days ▼</button>
@@ -486,7 +459,7 @@ export default function Dashboard() {
               </div>
 
               {/* Funnel Section */}
-              <div style={{ flex: 1, margin: '0 18px' }} className="outreach-breakdown-card">
+              <div className="flex-1 outreach-breakdown-card">
                 <div className="card-heading">Funnel Overview</div>
                 <div className="funnel-overview" style={{ padding: 12 }}>
                   <div className="funnel-svg" style={{ width: 160, position: 'relative', zIndex: 2, marginRight: -28 }}>
@@ -558,7 +531,7 @@ export default function Dashboard() {
               </div>
 
               {/* Account Health Section */}
-              <div style={{ flex: 1 }} className="outreach-breakdown-card">
+              <div className="flex-1 outreach-breakdown-card">
                 <div className="card-heading">Account Health</div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 12 }}>
                   <div style={{ width: 120, height: 120, display:'flex', alignItems:'center', justifyContent:'center' }}>
